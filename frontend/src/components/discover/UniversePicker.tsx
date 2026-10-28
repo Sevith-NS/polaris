@@ -1,20 +1,18 @@
 import { useMemo } from 'react';
+import { Select } from '../ui/Select';
 import type { UniverseMeta } from '../../types/discover';
 
 /**
- * Grouped universe dropdown.
- *
- * Replaces the old chip row, which worked at three universes and does not at
- * twelve — the NIFTY index families alone are five entries, and a wrapping
- * two-line chip row buries the market you actually want. A native <select>
- * with <optgroup> gets the OS picker on mobile for free and stays one line.
+ * Grouped universe dropdown, shared by every Markets view that scans a
+ * universe. The NIFTY index families alone are five entries, so a chip row
+ * would wrap and bury the market you want.
  *
  * A universe whose membership could not be built (the NIFTY families depend on
  * the NSE constituent feed) stays visible but disabled, labelled as such:
  * dropping it silently would read as a bug rather than as an upstream outage.
  */
 
-const GROUP_ORDER = ['US', 'India', 'Global', 'Crypto', 'Commodities'];
+const GROUP_ORDER = ['US', 'India', 'Global', 'Bonds', 'Crypto', 'Commodities'];
 
 export default function UniversePicker({
   universes,
@@ -27,13 +25,11 @@ export default function UniversePicker({
   onChange: (id: string) => void;
   id?: string;
 }) {
-  const groups = useMemo(() => {
+  const options = useMemo(() => {
     const byGroup = new Map<string, UniverseMeta[]>();
     for (const u of universes) {
       const key = u.group || 'Other';
-      const bucket = byGroup.get(key);
-      if (bucket) bucket.push(u);
-      else byGroup.set(key, [u]);
+      byGroup.set(key, [...(byGroup.get(key) ?? []), u]);
     }
     // Known groups in the documented order, then anything the backend adds
     // later that this list has not caught up with.
@@ -41,33 +37,18 @@ export default function UniversePicker({
       ...GROUP_ORDER.filter((g) => byGroup.has(g)),
       ...[...byGroup.keys()].filter((g) => !GROUP_ORDER.includes(g)),
     ];
-    return ordered.map((group) => ({ group, items: byGroup.get(group)! }));
+    return ordered.flatMap((group) => byGroup.get(group)!.map((u) => ({
+      value: u.id,
+      group,
+      disabled: u.available === false,
+      label: u.available === false ? `${u.label} (unavailable)` : u.count > 0 ? `${u.label} (${u.count})` : u.label,
+    })));
   }, [universes]);
 
   return (
-    <div className="flex items-center gap-2">
-      <label htmlFor={id} className="text-caption text-fg-3">
-        Universe
-      </label>
-      <select
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="min-w-[190px] rounded-lg border border-white/15 bg-black/30 px-3 py-1.5 text-sm text-fg transition-colors focus:border-fg-2/50"
-      >
-        {groups.map(({ group, items }) => (
-          <optgroup key={group} label={group}>
-            {items.map((u) => (
-              <option key={u.id} value={u.id} disabled={u.available === false}>
-                {u.label}
-                {u.available === false
-                  ? ' (unavailable)'
-                  : u.count > 0 && ` (${u.count})`}
-              </option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
+    <div className="flex w-full items-center gap-3 sm:w-auto">
+      <label htmlFor={id} className="shrink-0 text-body-sm text-fg-2">Universe</label>
+      <Select id={id} value={value} onChange={onChange} options={options} className="sm:w-64" />
     </div>
   );
 }

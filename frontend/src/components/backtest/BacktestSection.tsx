@@ -10,6 +10,7 @@ import {
   BACKTEST_INTERVALS, BacktestRequest, fetchStrategies, runBacktest,
 } from '../../lib/backtest';
 import { MicroLabel } from '../agents/DeskAtoms';
+import { Select } from '../ui/Select';
 import BacktestResults from './BacktestResults';
 import BacktestLab from './BacktestLab';
 import { MonteCarloPanel, OosPanel } from './RobustnessPanels';
@@ -244,32 +245,22 @@ export default function BacktestSection({ symbol, currency }: {
         {/* ---- Primary controls ---- */}
         <div className="mt-4 grid grid-cols-1 gap-3 border-t border-line pt-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Strategy" hint={strategy?.doc}>
-            <select
+            <Select
+              label="Strategy"
               value={strategyName}
-              onChange={(e) => {
-                setStrategyName(e.target.value);
+              onChange={(v) => {
+                setStrategyName(v);
                 // Parameters belong to a strategy: never carry a stale
                 // `fast=10` onto something with no `fast` at all.
                 setParams({});
               }}
-              className={inputClass}
-            >
-              {strategies.map((s) => (
-                <option key={s.name} value={s.name}>{s.name}</option>
-              ))}
-            </select>
+              options={strategies.map((s) => ({ value: s.name, label: s.name }))}
+            />
           </Field>
 
           <Field label="Interval" hint={intervalMeta?.coverage}>
-            <select
-              value={interval}
-              onChange={(e) => setInterval(e.target.value)}
-              className={inputClass}
-            >
-              {BACKTEST_INTERVALS.map((t) => (
-                <option key={t.id} value={t.id}>{t.label}</option>
-              ))}
-            </select>
+            <Select label="Interval" value={interval} onChange={setInterval}
+                    options={BACKTEST_INTERVALS.map((t) => ({ value: t.id, label: t.label }))} />
           </Field>
 
           <Field

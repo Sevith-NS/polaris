@@ -1,13 +1,14 @@
 'use client';
 
 import { ModeBadge } from '@/components/ui/ModeBadge';
+import { Select } from '@/components/ui/Select';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { ALL_REAL, usePortfolioSelection } from './selection';
 
 /**
  * Which book you're looking at: All real, each real account, each paper
- * portfolio (docs/DESIGN.md §7). A native select keeps keyboard, screen
- * reader and phone pickers right; the badge beside it says Real or Paper.
+ * portfolio (docs/DESIGN.md §7), grouped in the glass Select; the badge
+ * beside it says Real or Paper.
  */
 export function PortfolioSwitcher() {
   const { accounts } = usePortfolio();
@@ -21,20 +22,11 @@ export function PortfolioSwitcher() {
   return (
     <div className="flex items-center gap-3">
       <label htmlFor="portfolio-switcher" className="sr-only">Portfolio</label>
-      <select id="portfolio-switcher" value={selection.key} onChange={(e) => select(e.target.value)}
-              className="min-h-11 max-w-[16rem] rounded-sm border border-white/15 bg-black/30 px-3 text-body-sm text-fg hover:border-white/30">
-        {real.length > 0 && (
-          <optgroup label="Real (read-only)">
-            {real.length > 1 && <option value={ALL_REAL}>All real ({real.length} accounts)</option>}
-            {real.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </optgroup>
-        )}
-        {paper.length > 0 && (
-          <optgroup label="Paper (simulated)">
-            {paper.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </optgroup>
-        )}
-      </select>
+      <Select id="portfolio-switcher" value={selection.key} onChange={select} className="max-w-[16rem]" options={[
+        ...(real.length > 1 ? [{ value: ALL_REAL, label: `All real (${real.length} accounts)`, group: 'Real (read-only)' }] : []),
+        ...real.map((a) => ({ value: a.id, label: a.name, group: 'Real (read-only)' })),
+        ...paper.map((a) => ({ value: a.id, label: a.name, group: 'Paper (simulated)' })),
+      ]} />
       <ModeBadge mode={selection.mode} />
     </div>
   );

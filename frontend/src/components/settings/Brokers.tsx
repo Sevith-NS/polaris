@@ -6,6 +6,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Field, inputClass } from '@/components/ui/Field';
+import { Select } from '@/components/ui/Select';
 import { ErrorState, LoadingBlock } from '@/components/ui/States';
 import { SyncBadge } from '@/components/ui/SyncBadge';
 import { useToast } from '@/components/ui/Toast';
@@ -158,10 +159,8 @@ function ConnectForm({ broker, maxKeepDays, onClose, onLinked, onStarted }: {
       <Field id="cred-keep" label="Keep this connection" error={error}
              hint={oauth ? `Your ${broker.label} session still ends every day; until then, reconnecting reuses these keys.`
                : undefined}>
-        <select id="cred-keep" value={keep} className={inputClass}
-                onChange={(e) => { setKeep(e.target.value as BrokerKeep); setError(null); }}>
-          {KEEP_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label(broker)}</option>)}
-        </select>
+        <Select id="cred-keep" value={keep} options={KEEP_OPTIONS.map((o) => ({ value: o.value, label: o.label(broker) }))}
+                onChange={(v) => { setKeep(v as BrokerKeep); setError(null); }} />
       </Field>
       {keep === 'custom' && (
         <Field id="cred-until" label="Keep until">
