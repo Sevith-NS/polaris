@@ -91,7 +91,9 @@ export type DeepAnalysis = {
   fundamentals: Fundamentals | Failed;
   technical: Technical | Failed;
   readings: Readings;
+  /** The newest saved teardown for this symbol, and the IST day it was written. */
   narrative: Narrative | null;
+  narrative_at: string | null;
 };
 
 export type HoldingIntel =

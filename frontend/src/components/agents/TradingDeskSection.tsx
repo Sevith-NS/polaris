@@ -269,6 +269,14 @@ export default function TradingDeskSection({
                 <Timer size={11} /> {(state.elapsedMs / 1000).toFixed(1)}s
               </span>
             )}
+            {context.as_of && (
+              <span>
+                data as of{' '}
+                <span className="tabular text-fg-2">
+                  {new Date(context.as_of * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                </span>
+              </span>
+            )}
           </div>
         )}
       </div>

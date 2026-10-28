@@ -167,3 +167,14 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T7.5** Propose an E2E harness (Playwright) covering sign-in, switch portfolio, place a paper order, create an alert. Ask before adding the dependency. `[S]`
 - [ ] **T7.6** Update `PRODUCT.md` and `CLAUDE.md` if anything drifted during the build. `[S]`
 - [ ] **T7.7** Empty values read "Unavailable" (RULES §8), not the "–" placeholder in `lib/format` and 47 call sites. `[M]`
+
+## Phase 8: Speed and AI (agreed 2026-10-28)
+
+- [x] **T8.1** AI desk: fail fast on quota, stop when no analyst files, local model first (`OMNIROUTE_PRIMARY`), model part shared per symbol per day. `[BE]` `[M]`
+- [x] **T8.2** Deep Dive: saved teardown shows on open with its date, rewrite only when not today's, new copy. `[BE]` `[S]`
+- [ ] **T8.3** Apply migration `0006_research_runs.sql` to the branch local dev should use (owner call: `.env` points at production). Until then nothing is saved. `[S]`
+- [ ] **T8.4** Shared market cache in Neon behind `data_source._cache_get` / `_cache_put`, so a serverless start isn't a cold cache. `[BE]` `[M]`
+- [ ] **T8.5** Movers board built by a scheduled job (`/internal/jobs/movers`, secret header, cron-job.org every 5 min in NSE hours), read as one row; drop the warming and batch-count UI. `[BE]` `[L]`
+- [ ] **T8.6** Shared client cache inside `useApi.ts`: one request per path, last data shown on return, quiet refresh. `[M]`
+- [ ] **T8.7** One quotes request for watchlist rows (`/api/quotes?symbols=`) instead of one per row. `[BE]` `[M]`
+- [ ] **T8.8** Strategies from *151 Trading Strategies*: three moving averages (3.13), pivot support and resistance (3.14), channel mean reversion (3.15), time-series momentum (3.1/10.4), short-term reversal (10.3). `[BE]` `[M]`

@@ -17,6 +17,7 @@ The running record of what's done, what was decided and why. Newest first within
 
 | Date | Task | Note |
 |---|---|---|
+| 2026-10-28 | AI desk + Deep Dive: local model, saved research [BE+FE] | Desk ran 9 Gemini calls per run and kept retrying every seat after the free quota ran out. Now: a quota error fails the seat at once and later seats don't call Gemini inside the bench window; the run stops with an error when no analyst files. `llm_router` gained `OMNIROUTE_PRIMARY` (an OpenAI-compatible server first, Gemini as fallback) and `OMNIROUTE_REASONING_EFFORT`; local dev uses Ollama 0.40.12 + `qwen3.5:4b` as `polaris-qwen` (16K context, thinking off, 100% GPU on the RTX 3060 6 GB, about 7 s per short JSON answer, about 2 min to load cold). Qwen3.8-27B (18 GB) and DeepSeek-R1 (671B) don't fit this laptop. New shared `research_runs` table (migration 0006): the desk's model part is saved per symbol, rounds and IST day and replayed with this user's portfolio, rules and note; the teardown is saved per symbol per day and shown on open with "Written 28 Oct 2026", rewritable only when it isn't today's. The portfolio was never in a prompt, so nothing had to be removed. Real run on TCS.NS: live 109 s, all 7 seats; replay 0 s, 0 calls; teardown 49 s, 12 sections. 12 desk/deep-analysis tests (5 new) pass; tsc, eslint pass. **Migration 0006 not applied** (blocked: `.env` points at production). |
 | 2026-10-28 | Verified in Chrome | CDP harness with the API mocked from live engine output (scratchpad). Overview on Bond ETFs (16 of 16 priced), Select keyboard path (open on current, groups in order, Home+Enter writes `?u=`, Escape keeps value, focus stays), Movers threshold (6 rows at 5%, 2 at 10%), 20 screens, Alerts tabs and old `?tab=paused`, chart right-click to POST and toast, no x-scroll at 390, reduced motion, no console errors. lint, tsc, 28 tests, `next build` pass. Not checked: real signed-in data, 768/1024, a real trackpad right-click on macOS. |
 | 2026-10-28 | Plain copy sweep | Owner: no em dashes, colons or semicolons in the UI, plain English. A TypeScript AST pass over every string and JSX text found 55 sentences (no em dashes left in visible copy; they were all in comments). Rewritten across 23 files, plus screen and movers copy in the backend. Times and ratios keep their colons. |
 | 2026-10-28 | T4.34 chart alerts + /alerts | `Chart` `onAddAlert`: right-click (long-press on Android) on the price pane opens a glass one-item menu, "Add alert at <price>"; `ChartPanel` opens `AlertSheet` pre-filled (symbol, price, rises/falls from the last close), has an Add alert button (price left empty so it can't fire at once), draws active price alerts as dashed fg-2 lines, toasts on save. `/alerts` is now Scheduled (active + paused, paused pill) and Triggered (firing log, Turn on again on an alert's newest firing only; the old tab listed each firing twice). |
@@ -59,6 +60,8 @@ The running record of what's done, what was decided and why. Newest first within
 
 | Date | Decision | Why / source |
 |---|---|---|
+| 2026-10-28 | **AI research is shared per symbol per day** (desk runs, Deep Dive teardowns). The personal part (portfolio, Your rules, journal note) is computed for each user. Show the real "data as of" time, never fake a fresh run. | Owner Q&A; honest about data |
+| 2026-10-28 | Local model for the desk and teardown in dev: Qwen via Ollama, Gemini as fallback. A self-hosted 27B needs a 24 GB+ GPU server, not Vercel. | Owner Q&A |
 | 2026-10-11 | **Product is a personal portfolio manager** with real and paper portfolios, kept separate and never summed. | Owner Q&A |
 | 2026-10-11 | Real holdings come in through **read-only broker API sync** (start with Zerodha Kite and Upstox). No order placement on real accounts. | Owner Q&A |
 | 2026-10-11 | **Markets: India + US**, INR or USD base currency with FX conversion. | Owner Q&A |
@@ -99,6 +102,8 @@ The running record of what's done, what was decided and why. Newest first within
 
 ## Noticed (not fixed)
 
+- The full backend suite ran once on 2026-10-28 against the production Neon branch before this file's warning was read. Its DB tests create and delete throwaway `user_t…` users; a read-only check afterwards found no rows from that day. One older throwaway user, `user_t642901d0ca6049cc` (created 2026-10-25), is still in production. Not deleted (owner call).
+- Ollama has no authentication. Exposing port 11434 to the internet (for the deployed backend) needs a tunnel with an access token in front of it.
 - `next build` on 16.4.0 stops once with a "known security vulnerability" notice and suggests `next upgrade --agent=security`; a retry builds. A `chore/next-16.4.3` branch exists. Not upgraded (2026-10-28).
 - AI-written text (desk, deep analysis, assistant) comes from the model at runtime and can still hold em dashes or colons; the prompts were not changed.
 - Empty values still show "–" from `lib/format` and 47 call sites; RULES §8 says "Unavailable" (T7.7).

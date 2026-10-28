@@ -60,18 +60,23 @@ const PILLAR_NOTES: Record<string, string> = {
 
 /**
  * The deep dive: five readings side by side (no blended call, no conviction,
- * no "buy below" price), technical phase, and an on-demand Gemini write-up
- * that explains the data without recommending anything. Figures come from the
- * computed numbers; qualitative context from the model's knowledge.
+ * no "buy below" price), technical phase, and an AI write-up that explains
+ * the data without recommending anything. The newest saved write-up shows on
+ * open; a new one is written at most once a day per symbol. Figures come from
+ * the computed numbers; qualitative context from the model's knowledge.
  */
 export default function DeepAnalysisSection({ symbol, currency }: { symbol: string; currency: string }) {
   const { data, error, loading } = useApi<DeepAnalysis>(`/api/deep-analysis?symbol=${encodeURIComponent(symbol)}`);
   // The AI teardown belongs to the symbol it was written for; switching
   // tickers drops it rather than showing one company's story under another.
-  const [ai, setAi] = useState<{ symbol: string; narrative?: Narrative; error?: string } | null>(null);
+  const [ai, setAi] = useState<{ symbol: string; narrative?: Narrative; at?: string; error?: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
-  const narrative = ai?.symbol === symbol ? ai.narrative ?? null : null;
-  const aiError = ai?.symbol === symbol ? ai.error ?? '' : '';
+  const mine = ai?.symbol === symbol ? ai : null;
+  const narrative = mine?.narrative ?? data?.narrative ?? null;
+  const writtenAt = (mine?.narrative ? mine.at : data?.narrative_at) ?? null;
+  const aiError = mine?.error ?? '';
+  // The backend counts teardown days in IST, so compare in IST too.
+  const writtenToday = writtenAt === new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
 
   const runAiTeardown = async () => {
     const forSymbol = symbol;
@@ -80,8 +85,8 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
     try {
       const d = await apiGet<DeepAnalysis>(`/api/deep-analysis?symbol=${encodeURIComponent(forSymbol)}&ai=1`);
       setAi(d.narrative
-        ? { symbol: forSymbol, narrative: d.narrative }
-        : { symbol: forSymbol, error: 'The AI teardown is unavailable right now. The numbers above still stand.' });
+        ? { symbol: forSymbol, narrative: d.narrative, at: d.narrative_at ?? undefined }
+        : { symbol: forSymbol, error: "The deep dive can't be written right now. The numbers above still stand." });
     } catch (err) {
       setAi({ symbol: forSymbol, error: errorMessage(err) });
     } finally {
@@ -191,25 +196,29 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
               figures from computed data · context from model knowledge
             </span>
           </h3>
-          {!narrative && (
+          {(!narrative || !writtenToday) && (
             <button
               onClick={runAiTeardown}
               disabled={aiLoading}
               className="rounded-lg border border-fg-2/30 bg-fg-2/5 px-4 py-2 text-xs font-semibold text-fg-2 transition-colors hover:bg-fg-2/10 disabled:opacity-50"
             >
-              {aiLoading ? 'Writing the teardown…' : 'Generate teardown'}
+              {aiLoading ? 'Writing the deep dive…' : narrative ? "Rewrite with today's data" : 'Write the deep dive'}
             </button>
           )}
         </div>
 
         {aiError && <p className="text-xs text-down">{aiError}</p>}
 
+        {narrative && writtenAt && (
+          <p className="mb-3 text-caption text-fg-3">
+            Written {new Date(`${writtenAt}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}.
+          </p>
+        )}
+
         {!narrative && !aiError && !aiLoading && (
           <p className="text-xs text-fg-2">
-            One click writes a plain-English deep dive covering the business model, latest quarter, balance
-            sheet, competitive position, management, technical setup, catalysts, what&apos;s going
-            well and what could go wrong, valuation, and what to watch next. It explains. It
-            doesn&apos;t tell you what to do.
+            A plain-English teardown of {symbol}. It covers the business, the latest quarter, the balance
+            sheet, risks and valuation. It explains and never tells you what to do.
           </p>
         )}
 
@@ -296,9 +305,8 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
         })()}
 
         <p className="mt-4 border-t border-line pt-2 text-caption leading-relaxed text-fg-3">
-          Figures are grounded in the computed data above. Qualitative context, including business model,
-          competitors and catalysts, comes from the model&apos;s general knowledge of the company,
-          so verify it independently. Information only, not investment advice or a recommendation.
+          Figures come from the data above. Background on the business and its rivals comes from the
+          model&apos;s general knowledge, so check it before relying on it. Not investment advice.
         </p>
       </div>
     </div>
