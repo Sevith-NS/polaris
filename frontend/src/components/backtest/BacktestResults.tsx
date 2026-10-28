@@ -257,7 +257,7 @@ export default function BacktestResults({ result, currency }: {
           against buy &amp; hold&apos;s <span className="font-semibold tabular text-fg-2">{signedPct(s.bh_cagr)}</span>,
           {' '}while in the market only <span className="font-semibold tabular text-fg-2">{pct(s.exposure, 0)}</span> of the time
           {' '}and drawing down <span className="font-semibold tabular text-down">{pct(s.max_dd)}</span> at worst
-          {' '}(buy &amp; hold: <span className="tabular">{pct(s.bh_max_dd)}</span>).
+          {' '}(buy &amp; hold <span className="tabular">{pct(s.bh_max_dd)}</span>).
         </span>
       </div>
 
@@ -296,7 +296,7 @@ export default function BacktestResults({ result, currency }: {
           <Line label="Calmar" value={num(s.calmar)} title="CAGR / max drawdown" />
           <Line
             label="Ulcer index" value={num(e.ulcer_index, 1)}
-            title="Root-mean-square drawdown: how deep, and for how long"
+            title="Root-mean-square drawdown, which counts both how deep and how long"
           />
           <Line
             label="Martin ratio" value={num(e.ulcer_performance_index)}
@@ -319,7 +319,7 @@ export default function BacktestResults({ result, currency }: {
           <Line
             label="Avg MAE, winners" value={`${num(e.excursions.avg_mae_winners, 1)}%`}
             tone="text-down/80"
-            title="How far winners went against you first: the stop-width evidence"
+            title="How far winners went against you first. This is the evidence for stop width."
           />
           <Line label="Avg MAE, losers" value={`${num(e.excursions.avg_mae_losers, 1)}%`} tone="text-down/80" />
           <Line

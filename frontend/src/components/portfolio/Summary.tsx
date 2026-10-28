@@ -54,7 +54,7 @@ function PaperPulse() {
         <dt className="text-caption text-fg-2">Open positions</dt>
         <dd className="text-h4 tabular">{book.positions.length}</dd>
       </div>
-      {unpriced && <p className="basis-full text-caption text-warn">Some holdings have no live price right now; they count at cost.</p>}
+      {unpriced && <p className="basis-full text-caption text-warn">Some holdings have no live price right now, so they count at cost.</p>}
     </dl>
     </section>
   );

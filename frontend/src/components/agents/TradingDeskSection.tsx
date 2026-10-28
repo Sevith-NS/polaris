@@ -194,7 +194,7 @@ export default function TradingDeskSection({
               argue it over {rounds} {rounds === 1 ? 'round' : 'rounds'}, and a balanced summary explains
               the data and how the plan&apos;s levels were computed. &ldquo;Your rules&rdquo; then works out
               what your own risk setting implies. Every figure comes from this platform&apos;s engines. The
-              desk explains; it never tells you what to do.
+              desk explains. It never tells you what to do.
             </p>
           </div>
 
@@ -320,7 +320,7 @@ export default function TradingDeskSection({
           className="glass rounded-xl flex w-full items-center justify-center gap-2 p-4 text-xs font-semibold text-fg-2 transition-colors hover:text-fg"
         >
           <BookOpen size={14} className="text-fg-2" />
-          Show desk notes: what each past run explained
+          Show desk notes from past runs
         </button>
       )}
     </div>

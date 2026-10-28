@@ -82,7 +82,7 @@ export function IndicesStrip() {
           : <Missing label="USD/INR" />}
       </ul>
       <p className="text-caption text-fg-3">
-        Delayed data from Yahoo Finance{updated ? `, updated ${timeAgo(updated)}` : ''}. Session state uses regular hours; holidays aren&apos;t applied.
+        Delayed data from Yahoo Finance{updated ? `, updated ${timeAgo(updated)}` : ''}. Session state uses regular hours and doesn&apos;t know about holidays.
         {fx.data?.stale && ' The USD/INR rate is out of date.'}
       </p>
     </section>

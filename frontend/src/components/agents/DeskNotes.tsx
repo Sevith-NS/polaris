@@ -128,7 +128,7 @@ export default function DeskNotes({
       {!error && entries.length === 0 && !loading && (
         <p className="flex items-center gap-2 text-[12px] text-fg-3">
           <Target size={13} />
-          No notes yet. Each desk run keeps one here: its summary and what it said to watch.
+          No notes yet. Each desk run keeps one here with its summary and what it said to watch.
         </p>
       )}
 

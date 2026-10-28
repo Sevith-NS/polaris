@@ -21,7 +21,7 @@ export default function Terms() {
       <p>Access is by invitation during the preview. Keep your sign-in to yourself and turn on two-step verification. We may suspend accounts that abuse the service, for example by scraping it or trying to reach other people&apos;s data.</p>
 
       <h2>Changes</h2>
-      <p>Polaris is visibly in progress. Features and these terms will change; we will note the date above when they do.</p>
+      <p>Polaris is visibly in progress. Features and these terms will change, and we will note the date above when they do.</p>
     </>
   );
 }

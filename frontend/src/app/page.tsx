@@ -97,17 +97,17 @@ function SectionHead({ kicker, title, body, id }: { kicker: string; title: React
 const COMPARE: { row: string; cells: [string, string, string, string] }[] = [
   { row: 'What it is', cells: ['Read-only tracker and paper desk', 'Model portfolios you buy through your broker', 'Research and screener platform', 'Back office for a Zerodha account'] },
   { row: 'Who decides what to buy', cells: ['You. Polaris never recommends', 'SEBI-registered basket managers', 'You. Content is informational', 'You'] },
-  { row: 'SEBI status', cells: ['Not registered; a software tool', 'Managers are registered RAs, RIAs or PMS', 'No RA or IA licence', 'Registered stockbroker'] },
-  { row: 'Price', cells: ['Free during the beta', '₹100 or 1.5% per buy, plus any manager fee', 'Free tier; Pro from ₹399 a month', 'Included with the account'] },
+  { row: 'SEBI status', cells: ['A software tool, not registered', 'Managers are registered RAs, RIAs or PMS', 'No RA or IA licence', 'Registered stockbroker'] },
+  { row: 'Price', cells: ['Free during the beta', '₹100 or 1.5% per buy, plus any manager fee', 'Free tier, Pro from ₹399 a month', 'Included with the account'] },
 ];
 
 const FAQ: [string, ReactNode][] = [
-  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk; Polaris does the arithmetic and shows its working.'],
+  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk. Polaris does the arithmetic and shows its working.'],
   ['Who sets the entry and stop?', 'You do, by choosing the method and your risk per trade. Every formula and every input is on screen, and plans only place paper orders.'],
   ['Where does the data come from, and how old is it?', 'Market data comes from Yahoo Finance and NSE public pages, and news from Google News. Quotes can be delayed. Every figure shows its source and time.'],
-  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else: there is no order button on a real account. The access token is encrypted into a cookie in your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
-  ['How does Polaris make money?', 'It doesn’t yet; it’s free during the beta. We take no commissions from brokers, basket managers or referrals, and no stock is ever featured for pay.'],
-  ['When do US brokers come?', 'US markets are live today. Syncing US broker holdings is planned; until then Polaris says so plainly instead of pretending.'],
+  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else. There is no order button on a real account. The access token is encrypted into a cookie in your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
+  ['How does Polaris make money?', 'It doesn’t yet. It’s free during the beta. We take no commissions from brokers, basket managers or referrals, and no stock is ever featured for pay.'],
+  ['When do US brokers come?', 'US markets are live today. Syncing US broker holdings is planned. Until then Polaris says so plainly instead of pretending.'],
   ['How do I delete my data?', 'Settings → Delete account removes everything Polaris stores, and Settings → Export gives you a copy first.'],
 ];
 

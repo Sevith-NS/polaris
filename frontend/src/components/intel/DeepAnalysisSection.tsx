@@ -94,7 +94,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
       <div className="glass rounded-xl flex items-center gap-3 p-5">
         <Hourglass size={16} className="text-fg-2" />
         <p className="text-sm text-fg-2">
-          Running deep analysis for {symbol}: statements, valuation history, phase &amp; news sweep…
+          Running deep analysis for {symbol}. Reading statements, valuation history, phase and news…
         </p>
       </div>
     );
@@ -206,9 +206,9 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
 
         {!narrative && !aiError && !aiLoading && (
           <p className="text-xs text-fg-2">
-            One click writes a plain-English deep dive: business model, latest quarter, balance
+            One click writes a plain-English deep dive covering the business model, latest quarter, balance
             sheet, competitive position, management, technical setup, catalysts, what&apos;s going
-            well and what could go wrong, valuation, and what to watch next. It explains; it
+            well and what could go wrong, valuation, and what to watch next. It explains. It
             doesn&apos;t tell you what to do.
           </p>
         )}
@@ -297,8 +297,8 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
 
         <p className="mt-4 border-t border-line pt-2 text-caption leading-relaxed text-fg-3">
           Figures are grounded in the computed data above. Qualitative context, including business model,
-          competitors and catalysts, comes from the model&apos;s general knowledge of the company:
-          verify it independently. Information only, not investment advice or a recommendation.
+          competitors and catalysts, comes from the model&apos;s general knowledge of the company,
+          so verify it independently. Information only, not investment advice or a recommendation.
         </p>
       </div>
     </div>

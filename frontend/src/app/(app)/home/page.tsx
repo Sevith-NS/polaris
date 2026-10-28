@@ -55,7 +55,7 @@ function RecentNotes() {
         : error ? <ErrorState error={error} onRetry={reload} />
         : !data?.entries.length ? (
           <EmptyState title="No notes yet">
-            Open a symbol and run the research desk. Each run keeps a note here: its summary and what to watch.
+            Open a symbol and run the research desk. Each run keeps a note here with its summary and what to watch.
           </EmptyState>
         ) : (
           <ul className="divide-y divide-white/[0.07]">

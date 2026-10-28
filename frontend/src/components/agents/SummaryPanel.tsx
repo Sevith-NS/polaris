@@ -67,7 +67,7 @@ export default function SummaryPanel({ summary }: { summary: SummaryEvent }) {
           )}
 
           <p className="border-t border-line pt-2 text-caption text-fg-3">
-            The desk explains the data; it doesn&apos;t tell you what to do. Information only, not
+            The desk explains the data. It doesn&apos;t tell you what to do. Information only, not
             investment advice.
           </p>
         </div>

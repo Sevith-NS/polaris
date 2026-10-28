@@ -190,7 +190,7 @@ export function RealHoldings({ accounts }: { accounts: Account[] }) {
         ))}
       </ul>
       <p className="text-caption text-fg-3">
-        Read-only and live from your broker; values in {base} use the latest exchange rate. Crypto balances carry no
+        Read-only and live from your broker. Values in {base} use the latest exchange rate. Crypto balances carry no
         purchase price, so they have no P&amp;L. Polaris can&apos;t trade {multi ? 'these accounts' : 'this account'}.
       </p>
     </section>

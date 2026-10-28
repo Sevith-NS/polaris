@@ -20,8 +20,8 @@ type Available = BrokersResponse['available'][number];
 
 const SCOPE_COPY: Record<string, string> = {
   'profile:read': 'Your client ID and name',
-  'holdings:read': 'Your holdings: quantity, average price, last price',
-  'positions:read': 'Today’s positions: quantity and average price',
+  'holdings:read': 'Your holdings, with quantity, average price and last price',
+  'positions:read': 'Today’s positions, with quantity and average price',
 };
 
 const KEEP_OPTIONS: { value: BrokerKeep; label: (a: Available) => string }[] = [
@@ -50,9 +50,9 @@ function BrokerLogo({ broker, size = 32 }: { broker: BrokerName; size?: number }
 function ReadOnlyNote() {
   return (
     <p className="max-w-prose text-body-sm text-fg-2">
-      Polaris only reads from your broker, live, and stores nothing about it: each connection, with your broker app&apos;s
+      Polaris only reads from your broker, live, and stores nothing about it. Each connection, with your broker app&apos;s
       keys, is an encrypted cookie in this browser, kept for as long as you choose. It can&apos;t place orders, move money
-      or change anything in your account. Broker logins open in a new tab; brokers end sessions daily (Zerodha at 6:00
+      or change anything in your account. Broker logins open in a new tab. Brokers end sessions daily (Zerodha at 6:00
       IST), so you&apos;ll reconnect once a day, in one click.
     </p>
   );
@@ -157,7 +157,7 @@ function ConnectForm({ broker, maxKeepDays, onClose, onLinked, onStarted }: {
         </Field>
       ))}
       <Field id="cred-keep" label="Keep this connection" error={error}
-             hint={oauth ? `Your ${broker.label} session still ends every day; until then, reconnecting reuses these keys.`
+             hint={oauth ? `Your ${broker.label} session still ends every day. Until then, reconnecting reuses these keys.`
                : undefined}>
         <Select id="cred-keep" value={keep} options={KEEP_OPTIONS.map((o) => ({ value: o.value, label: o.label(broker) }))}
                 onChange={(v) => { setKeep(v as BrokerKeep); setError(null); }} />
@@ -308,7 +308,7 @@ export function Brokers() {
           <p className="text-fg-2">
             When you&apos;re done, {waiting.label} should bring you back to Polaris and this page updates by itself. If
             you stay on {waiting.label} after logging in, the Redirect URL saved on your {waiting.label} developer app is
-            wrong. It must be exactly:
+            wrong. It must be exactly the address below.
           </p>
           <code className="break-all rounded-md bg-white/[0.06] px-2 py-1 text-caption text-fg">{callbackUrl(waiting.broker)}</code>
           <div><Button variant="ghost" onClick={() => setWaiting(null)}>Dismiss</Button></div>

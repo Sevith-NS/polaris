@@ -32,7 +32,7 @@ type TicketProps = {
 export function OrderTicket({ open, ...props }: TicketProps & { open: boolean }) {
   // The form mounts fresh on every open, so it always starts from the current plan.
   return (
-    <Dialog open={open} onClose={props.onClose} title={`Paper order: ${props.symbol}`}>
+    <Dialog open={open} onClose={props.onClose} title={`Paper order for ${props.symbol}`}>
       <TicketForm {...props} />
     </Dialog>
   );

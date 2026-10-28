@@ -266,7 +266,7 @@ export default function BacktestSection({ symbol, currency }: {
           <Field
             label="Date range"
             hint={result?.range_clamped
-              ? `Clamped to ${result.range} ; the interval cannot reach further back`
+              ? `Limited to ${result.range} because this interval cannot reach further back`
               : undefined}
           >
             <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">

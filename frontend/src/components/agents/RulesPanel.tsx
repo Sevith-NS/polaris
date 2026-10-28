@@ -44,7 +44,7 @@ export default function RulesPanel({ rules, currency }: { rules: RulesEvent; cur
       {rules.existing_position && (
         <p className="mt-3 text-caption text-warn">
           You already hold {formatNumber(rules.existing_position.shares, 0)} shares
-          ({rawPct(rules.existing_position.pct_of_equity)} of the book); the share above includes them.
+          ({rawPct(rules.existing_position.pct_of_equity)} of the book). The share above includes them.
         </p>
       )}
       {rules.capped_by_cash && <p className="mt-2 text-caption text-warn">Cash limits this below your risk budget.</p>}

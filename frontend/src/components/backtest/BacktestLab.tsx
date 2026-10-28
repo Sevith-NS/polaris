@@ -409,7 +409,7 @@ export default function BacktestLab({ base, strategy }: {
             <>
               <div className="mt-3 rounded-lg border border-white/15 bg-black/30 p-2">
                 <MicroLabel className="mb-1 px-1">
-                  Stitched out-of-sample equity: every bar here was traded on parameters fitted
+                  Stitched out-of-sample equity. Every bar here was traded on parameters fitted
                   before it
                 </MicroLabel>
                 <EquityChart
