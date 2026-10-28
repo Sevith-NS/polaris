@@ -16,20 +16,6 @@ import clsx from 'clsx';
  *   eyebrow     mono uppercase 0.22em - rationed, not on every page
  */
 
-const SHELL = 'w-full';
-
-export function PageShell({
-  children,
-  className,
-  as: Tag = 'main',
-}: {
-  children: React.ReactNode;
-  className?: string;
-  as?: 'main' | 'div';
-}) {
-  return <Tag className={clsx(SHELL, className)}>{children}</Tag>;
-}
-
 export function PageHeader({
   title,
   description,
