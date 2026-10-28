@@ -26,13 +26,13 @@ export function describeAlert(a: Pick<Alert, 'symbol' | 'kind' | 'threshold'>): 
   return a.kind === 'move_pct' ? `${a.symbol} moves ${n}% or more in a day` : `${a.symbol} ${KIND_COPY[a.kind].label.toLowerCase()} ${n}`;
 }
 
-function Form({ alert, initialSymbol, onDone }: {
-  alert?: Alert; initialSymbol?: string; onDone: (saved: Alert) => void;
+function Form({ alert, initialSymbol, initialKind, initialThreshold, onDone }: {
+  alert?: Alert; initialSymbol?: string; initialKind?: AlertKind; initialThreshold?: string; onDone: (saved: Alert) => void;
 }) {
   const editing = Boolean(alert);
   const [symbol, setSymbol] = useState(alert?.symbol ?? initialSymbol ?? '');
-  const [kind, setKind] = useState<AlertKind>(alert?.kind ?? 'price_above');
-  const [threshold, setThreshold] = useState(alert ? String(Number(alert.threshold)) : '');
+  const [kind, setKind] = useState<AlertKind>(alert?.kind ?? initialKind ?? 'price_above');
+  const [threshold, setThreshold] = useState(alert ? String(Number(alert.threshold)) : initialThreshold ?? '');
   const [note, setNote] = useState(alert?.note ?? '');
   const [touched, setTouched] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -71,7 +71,7 @@ function Form({ alert, initialSymbol, onDone }: {
       {editing && alert ? (
         <p className="text-body-sm text-fg-2">
           <span className="ticker text-fg">{alert.symbol}</span> · {KIND_COPY[alert.kind].label.toLowerCase()} a level.
-          The symbol and type can&apos;t change; delete this alert and create a new one for that.
+          The symbol and type can&apos;t change. To change them, delete this alert and create a new one.
         </p>
       ) : (
         <>
@@ -109,16 +109,17 @@ function Form({ alert, initialSymbol, onDone }: {
   );
 }
 
-/** Create or edit an alert in a Sheet (right panel on laptop, bottom sheet on phone). */
-export function AlertSheet({ open, onClose, alert, initialSymbol, onSaved }: {
-  open: boolean; onClose: () => void; alert?: Alert; initialSymbol?: string; onSaved: (saved: Alert) => void;
+/** Create or edit an alert in a Sheet (right panel on laptop, bottom sheet on phone). A chart pre-fills the symbol, type and price. */
+export function AlertSheet({ open, onClose, alert, initialSymbol, initialKind, initialThreshold, onSaved }: {
+  open: boolean; onClose: () => void; alert?: Alert; initialSymbol?: string; initialKind?: AlertKind; initialThreshold?: string;
+  onSaved: (saved: Alert) => void;
 }) {
   return (
     <Sheet open={open} onClose={onClose} title={alert ? 'Edit alert' : 'New alert'}
            description={alert ? undefined : 'Get told when a price crosses a level or moves sharply.'}>
       {/* Sheet unmounts its body once closed, so each opening starts from a clean form. */}
-      <Form key={alert?.id ?? 'new'} alert={alert} initialSymbol={initialSymbol}
-            onDone={(saved) => { onSaved(saved); onClose(); }} />
+      <Form key={alert?.id ?? 'new'} alert={alert} initialSymbol={initialSymbol} initialKind={initialKind}
+            initialThreshold={initialThreshold} onDone={(saved) => { onSaved(saved); onClose(); }} />
 
     </Sheet>
   );
