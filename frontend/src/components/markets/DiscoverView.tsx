@@ -39,9 +39,7 @@ function CardsLoading({ tall = false }: { tall?: boolean }) {
   );
 }
 
-/** A screen value keeps the backend's rounding (it differs per column) and gains digit grouping. */
-const screenValue = (v: number | null) =>
-  v === null ? 'Unavailable' : formatNumber(v, (String(v).split('.')[1] ?? '').length);
+const decimals = (v: number | null | undefined) => (v == null ? 0 : (String(v).split('.')[1] ?? '').length);
 
 function Ideas({ data, tag, onTag }: { data: DiscoverResponse; tag: HorizonTagId | 'all'; onTag: (t: HorizonTagId | 'all') => void }) {
   const counts = useMemo(() => {
@@ -102,6 +100,9 @@ function ScreenResults({ run }: { run: ScreenRunResponse }) {
       </EmptyState>
     );
   }
+  // The backend rounds per column (RSI to 1 place, day counts to 0). JSON drops a trailing .0,
+  // so each column shows the most places any of its values has.
+  const digits = Object.fromEntries(run.columns.map((c) => [c.key, Math.max(0, ...run.matches.map((m) => decimals(m.values[c.key])))]));
   return (
     <>
       <p className="text-caption text-fg-3 tabular">
@@ -137,7 +138,9 @@ function ScreenResults({ run }: { run: ScreenRunResponse }) {
                 <td className="whitespace-nowrap py-1 pl-4 text-right tabular">{formatMoney(m.price, m.currency)}</td>
                 <td className="whitespace-nowrap py-1 pl-4 text-right"><Change pct={m.change_1d_pct} /></td>
                 {run.columns.map((c) => (
-                  <td key={c.key} className="whitespace-nowrap py-1 pl-4 text-right tabular text-fg-2">{screenValue(m.values[c.key] ?? null)}</td>
+                  <td key={c.key} className="whitespace-nowrap py-1 pl-4 text-right tabular text-fg-2">
+                    {m.values[c.key] == null ? 'Unavailable' : formatNumber(m.values[c.key], digits[c.key])}
+                  </td>
                 ))}
               </tr>
             ))}
@@ -231,7 +234,7 @@ function DiscoverContent() {
               ))}
             </nav>
 
-            <section aria-labelledby="screen-h" className="glass flex min-w-0 flex-col gap-4 rounded-2xl p-5 md:p-6">
+            <section aria-labelledby="screen-h" className="glass flex min-w-0 flex-col gap-4 self-start rounded-2xl p-5 md:p-6">
               {meta ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex flex-wrap items-center gap-2">

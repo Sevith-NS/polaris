@@ -105,7 +105,7 @@ function Movers() {
     <div className="flex flex-col gap-5">
       <Segmented label="Board" value={board} onChange={(v) => set('board', v)} options={BOARDS} />
 
-      <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
+      <div className="flex flex-wrap items-start gap-x-6 gap-y-4">
         <div className="flex w-full flex-col gap-1.5 sm:w-80">
           <label htmlFor="movers-scope" className="text-body-sm text-fg-2">Stocks</label>
           <Select id="movers-scope" value={scope} onChange={(v) => set('scope', v)} options={scopeOptions} />
