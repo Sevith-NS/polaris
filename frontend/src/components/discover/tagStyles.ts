@@ -1,21 +1,13 @@
-// Horizon tags are told apart by their label, not by colour: v2 keeps one
-// accent (green, for direction) and amber for stale data only. Static class
-// strings so Tailwind's scanner picks them up.
+// Horizon tags are told apart by their label, not by colour: green and red
+// mean direction only, and amber means stale data.
 
 import type { HorizonTagId } from '../../types/discover';
 
 export const TAG_ORDER: HorizonTagId[] = ['long_term', 'swing', 'short_term', 'intraday'];
 
 export const TAG_LABELS: Record<HorizonTagId, string> = {
-  long_term: 'Long Term',
+  long_term: 'Long term',
   swing: 'Swing',
-  short_term: 'Short Term',
+  short_term: 'Short term',
   intraday: 'Intraday',
-};
-
-export const TAG_STYLES: Record<HorizonTagId, { chip: string; dot: string }> = {
-  long_term: { chip: 'border-line text-fg-2', dot: 'bg-fg-3' },
-  swing: { chip: 'border-line text-fg-2', dot: 'bg-fg-3' },
-  short_term: { chip: 'border-line text-fg-2', dot: 'bg-fg-3' },
-  intraday: { chip: 'border-line text-fg-2', dot: 'bg-fg-3' },
 };

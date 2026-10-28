@@ -14,7 +14,7 @@ type Market = 'in' | 'us';
 const MARKETS: { id: Market; label: string }[] = [{ id: 'in', label: 'India' }, { id: 'us', label: 'US' }];
 
 /** Advancers / decliners as one bar; the counts are always written out too. */
-function BreadthBar({ b }: { b: MarketPulse['breadth'] }) {
+export function BreadthBar({ b }: { b: Omit<MarketPulse['breadth'], 'as_of'> }) {
   const total = b.advancing + b.declining + b.unchanged || 1;
   const pct = (n: number) => `${(n / total) * 100}%`;
   return (

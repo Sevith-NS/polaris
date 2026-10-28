@@ -25,20 +25,20 @@ export default function FreshnessNote({
   const stale = freshness?.stale === true;
 
   if (!stale) {
-    return <span className={clsx('text-xs text-fg-3', className)}>as of {asOf}</span>;
+    return <span className={clsx('text-caption text-fg-3', className)}>As of {asOf}</span>;
   }
 
   return (
     <span
       className={clsx(
-        'flex items-center gap-1.5 rounded border border-warn/30 bg-warn/10 px-2 py-1 text-xs text-warn',
+        'flex items-center gap-1.5 rounded border border-warn/30 bg-warn/10 px-2 py-1 text-caption text-warn',
         className,
       )}
-      title="The upstream feed has not returned a newer bar. Cached data is being served."
+      title="The price feed has not sent anything newer, so saved prices are shown."
     >
-      <AlertTriangle size={12} />
-      Stale data: newest bar is {asOf}
-      {age != null && <span className="tabular">({age}d old)</span>}
+      <AlertTriangle size={12} aria-hidden="true" />
+      Old data. The newest prices are from {asOf}
+      {age != null && <span className="tabular">, {age} days ago</span>}
     </span>
   );
 }
