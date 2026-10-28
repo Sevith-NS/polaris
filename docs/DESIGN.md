@@ -315,8 +315,8 @@ Every interactive component has six states: default, hover, focus-visible, activ
 | Component | Spec |
 |---|---|
 | `Field` | Visible label above (`text-body-sm` `fg-2`), control, then hint or error below (`text-caption`, error in `down` with an icon). Wired with `aria-describedby`. |
-| `Input` / `Select` / `Textarea` | `black/30` fill, 1px `control/70` border, radius 2, 44px tall, 16px text on phone. Focus: white border plus the white ring. |
-| `Segmented` | Track in `ink-2` (radius 2); the selected segment is `fg` white with `ink-0` text, like a primary button. Used for period pickers (1D 1W 1M 1Y All), Real/Paper and currency. |
+| `Input` / `Select` / `Textarea` | `black/30` fill, 1px `control/70` border, radius 2, 44px tall, 16px text on phone. Focus: white border plus the white ring. `Select` (`ui/Select`) draws its list in `glass-2`; never the native list, which the OS paints grey. |
+| `Segmented` | Single choice, radiogroup keys. Capsule chips that wrap on a phone (v4, 2026-10-28); the selected chip is `fg` white with `ink-0` text, like a primary button. Used for boards, thresholds and filters. |
 | `Switch` | 44px hit area; `up` when on, plus an "On"/"Off" text label. |
 | `Search` | Opens the command palette; shows a `Ctrl K` hint on `lg`+. |
 
@@ -431,12 +431,12 @@ Header (symbol, name, exchange, currency, session, Price, Change, watchlist togg
 
 ### 9.4 Markets
 
-Tabs: Overview · Movers · Ideas · Levels · Screens, with an India / US segmented control.
+Tabs: Overview · Movers · Ideas · Levels · Screens. One universe picker, kept in `?u=` and carried by the tabs; Movers is NSE only and has its own Stocks picker. Method notes sit behind "How this works".
 
 ### 9.5 Watchlists, Alerts, News, Settings
 
 - **Watchlists:** a list rail with the named lists and a DataTable with sparklines.
-- **Alerts:** active / triggered / paused tabs; create via a sheet.
+- **Alerts:** Scheduled (active and paused) and Triggered (the firing log) tabs. Create via a sheet, or right-click a price on any chart; live price alerts draw on the chart as dashed lines.
 - **News:** For you (holdings + watchlist) and Markets, with tone tags.
 - **Settings:** Profile, Security (Clerk), Brokers (connections with sync state, reconnect, disconnect), Preferences (base currency, density, reduced motion), Data and privacy.
 
