@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { FlaskConical, Footprints, Play, Square } from '@/components/ui/icons';
+import { Spinner } from '@/components/ui/Spinner';
 import type {
   Fold, OptimizeEvent, StrategyInfo, SweepRow, WalkForwardEvent, Curve, Verdict,
 } from '../../types/backtest';
@@ -47,7 +48,7 @@ function ProgressBar({ done, total, label }: { done: number; total: number; labe
   return (
     <div>
       <div className="mb-1 flex justify-between text-caption text-fg-3">
-        <span>{label}</span>
+        <span className="flex items-center gap-2"><Spinner size={16} />{label}</span>
         <span className="tabular">{done.toLocaleString()} / {total.toLocaleString()}</span>
       </div>
       <div className="h-1.5 overflow-hidden bg-white/[0.06]">
@@ -409,7 +410,7 @@ export default function BacktestLab({ base, strategy }: {
             <>
               <div className="mt-3 rounded-lg border border-white/15 bg-black/30 p-2">
                 <MicroLabel className="mb-1 px-1">
-                  Stitched out-of-sample equity: every bar here was traded on parameters fitted
+                  Stitched out-of-sample equity. Every bar here was traded on parameters fitted
                   before it
                 </MicroLabel>
                 <EquityChart

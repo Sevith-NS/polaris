@@ -18,7 +18,7 @@ export function PortfolioPulse() {
 function PaperPulse() {
   const { book, loading, error, refresh } = usePortfolio();
   if (loading && !book) {
-    return <div className="glass flex flex-wrap gap-8 rounded-2xl p-6"><Skeleton className="h-10 w-56" /><Skeleton className="h-10 w-32" /></div>;
+    return <div className="glass rounded-2xl p-6"><Skeleton className="h-10 w-full" /></div>;
   }
   if (error) return <ErrorState error={error} title="Couldn't load your portfolio" onRetry={() => void refresh()} />;
   if (!book) return null;
@@ -54,7 +54,7 @@ function PaperPulse() {
         <dt className="text-caption text-fg-2">Open positions</dt>
         <dd className="text-h4 tabular">{book.positions.length}</dd>
       </div>
-      {unpriced && <p className="basis-full text-caption text-warn">Some holdings have no live price right now; they count at cost.</p>}
+      {unpriced && <p className="basis-full text-caption text-warn">Some holdings have no live price right now, so they count at cost.</p>}
     </dl>
     </section>
   );

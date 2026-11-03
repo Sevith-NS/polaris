@@ -86,12 +86,22 @@ export type Narrative = Partial<Record<
   unknown
 >>;
 
+/** What a teardown was written from: the company profile and the headlines it read. */
+export type NarrativeSources = {
+  profile: string | null;
+  news: { title: string; outlet: string | null; published: string | null; link: string | null }[];
+};
+
 export type DeepAnalysis = {
   symbol: string;
   fundamentals: Fundamentals | Failed;
   technical: Technical | Failed;
   readings: Readings;
+  /** The newest saved teardown for this symbol, and the IST day it was written. */
   narrative: Narrative | null;
+  narrative_at: string | null;
+  /** Absent on teardowns written before 2026-11-03. */
+  narrative_sources?: NarrativeSources | null;
 };
 
 export type HoldingIntel =

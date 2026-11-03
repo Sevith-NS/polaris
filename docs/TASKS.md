@@ -44,8 +44,8 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T2.1** `/dev/ui` gallery route (rendered in development only, 404 in production) showing every primitive in every state. `[S]`
 - [x] **T2.2** `Button` v3.1: white primary, outlined secondary, radius 2, `paper` and `lg` variants, fixed-width loading. Update `ButtonLink`. `[S]`
 - [ ] **T2.3** `IconButton`, with a type-required `aria-label`. `[S]`
-- [ ] **T2.4** `Field`, `Input`, `Textarea`, `Select` v3 (ink-2 fill, control border, 16px text on phone, error wiring). `[M]`
-- [ ] **T2.5** `Segmented` (radiogroup semantics, arrow keys). `[M]`
+- [ ] **T2.4** `Field`, `Input`, `Textarea`, `Select` v3 (ink-2 fill, control border, 16px text on phone, error wiring). `[M]` *(`Select` done 2026-10-28: `ui/Select`, the list drawn in glass-2, every native select replaced. `Textarea` still open.)*
+- [x] **T2.5** `Segmented` (radiogroup semantics, arrow keys). `[M]` *(2026-10-28: capsule chips that wrap on phone. Older inline groups in TopMovers, ChartPanel and BacktestSection not migrated yet.)*
 - [ ] **T2.6** `Switch` with a text state. `[S]`
 - [x] **T2.7** `Card` and `Panel` on `glass-1` (radius 16, header slot with `text-micro` label, flush-table body, `tone` prop for semantic tints). `[M]`
 - [ ] **T2.8** `Tabs` v3: URL-synced option, sliding underline, horizontal scroll on phone. `[M]`
@@ -112,18 +112,23 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T4.18** Symbol header v3 (Price, Change, session, ProvenanceChip, watchlist toggle, Paper trade button). `[M]`
 - [ ] **T4.19** Overview layout (chart 8 cols, plan KeyValueList 4 cols); chart theme reads CSS variables. `[M]`
 - [ ] **T4.20** Restyle AI Desk panels on Card/Panel/Badge; sources and "Model unavailable" states. `[L]`
-- [ ] **T4.21** Restyle Backtest lab and results; permanent amber In-sample badge. `[M]`
+- [x] **T4.21** Restyle Backtest lab and results; permanent amber In-sample badge. `[M]` *(2026-11-03: setup card, report and chart. The Robustness and Optimizer panels keep their v3 internals.)*
 - [ ] **T4.22** Restyle Fundamentals and News tabs. `[M]`
 
 ### Markets
-- [ ] **T4.23** Markets layout: tabs + India/US Segmented in the URL. `[S]`
-- [ ] **T4.24** Restyle Overview, Movers, Ideas, Levels and Screens on DataTable/Card; not-advice line stays. `[L]`
+- [x] **T4.23** Markets layout: tabs + India/US Segmented in the URL. `[S]` *(2026-10-28: one universe picker in `?u=`, carried by the tabs, instead of India/US.)*
+- [x] **T4.24** Restyle Overview, Movers, Ideas, Levels and Screens on DataTable/Card; not-advice line stays. `[L]` *(2026-10-28, on `MoverTable` until T2.16 exists.)*
+- [x] **T4.35** Bond ETFs universe (US Treasury, credit, muni and NSE gilt ETFs) so the Overview's Bonds choice works. `[S]` `[BE]`
+- [x] **T4.36** More screens modelled on chartink's popular scans, close-only. `[M]` `[BE]`
+- [ ] **T4.37** Candle-pattern screens (NR7, inside bar, engulfing). Needs daily OHLC for every symbol, one upstream call each. `[M]` `[BE]`
 
 ### Watchlists and alerts (new)
 - [x] **T4.25** `/watchlists` (add it to `MORE` in `AppShell.tsx`): list rail (create, rename, delete with undo) + table with sparklines; phone shows lists as a Segmented/Select. `[L]`
 - [x] **T4.26** Add/remove from watchlist via the symbol header and palette. `[S]`
 - [x] **T4.27** `/alerts` list (add it to `MORE` in `AppShell.tsx`): Active, Triggered, Paused tabs. `[M]` `[BE]` alerts
 - [x] **T4.28** Create/edit alert sheet: price cross and % move first; validation; "checked every 60s, delayed data" note. `[M]` `[BE]` alerts
+- [x] **T4.34** Alerts from the chart: right-click a price for "Add alert at", Add alert button, active alerts as dashed lines; `/alerts` as Scheduled and Triggered. `[M]`
+- [ ] **T4.38** Drag an alert line on the chart to move its level. `[M]`
 - [ ] **T4.29** Alerts bell count + triggered list popover in the TopBar. `[S]` `[BE]` *(count done: sidebar badge, phone bell, More tab. Popover done on the phone top-bar bell (`AlertsBell`). Desktop has no TopBar yet: add `AlertsBell` there with T3.2.)*
 
 ### News, onboarding, auth
@@ -161,3 +166,27 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T7.4** Performance pass against `ARCHITECTURE.md` §10 budgets; dynamic-import offenders. `[M]`
 - [ ] **T7.5** Propose an E2E harness (Playwright) covering sign-in, switch portfolio, place a paper order, create an alert. Ask before adding the dependency. `[S]`
 - [ ] **T7.6** Update `PRODUCT.md` and `CLAUDE.md` if anything drifted during the build. `[S]`
+- [ ] **T7.7** Empty values read "Unavailable" (RULES §8), not the "–" placeholder in `lib/format` and 47 call sites. `[M]`
+
+## Phase 8: Speed and AI (agreed 2026-10-28)
+
+- [x] **T8.1** AI desk: fail fast on quota, stop when no analyst files, local model first (`OMNIROUTE_PRIMARY`), model part shared per symbol per day. `[BE]` `[M]`
+- [x] **T8.2** Deep Dive: saved teardown shows on open with its date, rewrite only when not today's, new copy. `[BE]` `[S]`
+- [x] **T8.3** Apply migration `0006_research_runs.sql` to the branch local dev should use (owner call: `.env` points at production). Until then nothing is saved. `[S]` *(2026-11-03: applied to production with 0007, owner approved.)*
+- [ ] **T8.4** Shared market cache in Neon behind `data_source._cache_get` / `_cache_put`, so a serverless start isn't a cold cache. `[BE]` `[M]`
+- [ ] **T8.5** Movers board built by a scheduled job (`/internal/jobs/movers`, secret header, cron-job.org every 5 min in NSE hours), read as one row; drop the warming and batch-count UI. `[BE]` `[L]`
+- [ ] **T8.6** Shared client cache inside `useApi.ts`: one request per path, last data shown on return, quiet refresh. `[M]`
+- [ ] **T8.7** One quotes request for watchlist rows (`/api/quotes?symbols=`) instead of one per row. `[BE]` `[M]`
+- [ ] **T8.8** Strategies from *151 Trading Strategies*: three moving averages (3.13), pivot support and resistance (3.14), channel mean reversion (3.15), time-series momentum (3.1/10.4), short-term reversal (10.3). `[BE]` `[M]`
+
+## Phase 9: Owner review (2026-11-03)
+
+- [x] **T9.1** Desk debate is one exchange: strength opens, caution answers. The 1 to 4 rounds picker goes (rounds repeated round 1). `[BE]` `[S]`
+- [x] **T9.2** Desk progress panel while it works: steps with status, elapsed time, which analysts have filed; skeletons where output will land. `[M]`
+- [x] **T9.3** Deep Dive reads fresh data: company profile from yfinance, dated headlines with outlets, every section kept. `[BE]` `[M]`
+- [x] **T9.4** Deep Dive layout: the one-liner first, sections grouped for reading, sources listed, a writing state with elapsed time. `[M]`
+- [x] **T9.5** Chart fills its card on the symbol Overview (no empty band under it). `[S]`
+- [x] **T9.6** Landing section for Ask Polaris (it reads the symbol on screen and your paper portfolio). `[S]`
+- [x] **T9.7** Ask Polaris keeps a chat history per user: saved conversations, reopen, delete. `[BE]` `[M]`
+- [x] **T9.8** Movers board fills in quietly: no warming, exclusion or coverage notes, a spinner while it scans. `[S]`
+- [x] **T9.9** Ask Polaris like a chat app: icon buttons (chats pane, new chat), a left chats pane grouped by day with generated titles and start times. `[BE]` `[M]`

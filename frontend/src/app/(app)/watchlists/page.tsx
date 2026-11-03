@@ -10,6 +10,7 @@ import { WatchlistTable } from '@/components/watchlists/WatchlistTable';
 import { Button } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { Field, describedBy, inputClass } from '@/components/ui/Field';
+import { Select } from '@/components/ui/Select';
 import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
 import { useToast } from '@/components/ui/Toast';
 import { apiDelete, apiPatch, apiPost, errorMessage } from '@/lib/api';
@@ -169,9 +170,8 @@ function WatchlistsPage() {
             <section aria-labelledby="wl-title" className="glass flex min-w-0 flex-col gap-4 rounded-2xl p-5 md:p-6">
               <div className="lg:hidden">
                 <label htmlFor="wl-select" className="mb-1.5 block text-table text-fg-2">List</label>
-                <select id="wl-select" value={list.id} onChange={(e) => select(e.target.value)} className={inputClass}>
-                  {lists.map((w) => <option key={w.id} value={w.id}>{w.name} ({w.symbols.length})</option>)}
-                </select>
+                <Select id="wl-select" value={list.id} onChange={select}
+                        options={lists.map((w) => ({ value: w.id, label: `${w.name} (${w.symbols.length})` }))} />
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3">

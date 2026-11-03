@@ -26,7 +26,7 @@ export function SheetDemo() {
       >
         <div className="flex flex-col gap-3">
           {Array.from({ length: 24 }, (_, i) => (
-            <p key={i} className="text-body-sm text-fg-2">Row {i + 1}: the body scrolls; the header and footer stay put.</p>
+            <p key={i} className="text-body-sm text-fg-2">Row {i + 1}. The body scrolls and the header and footer stay put.</p>
           ))}
         </div>
       </Sheet>

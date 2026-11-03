@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { timeAgo } from '@/lib/format';
 import type { SyncStatus } from '@/types/api';
+import { Spinner } from './Spinner';
 
 const LABEL: Record<SyncStatus, string> = {
   connected: 'Connected',
@@ -21,7 +22,8 @@ export function SyncBadge({ broker, status, lastSyncedAt, className }: {
     // Wraps on narrow cards: three parts are wider than a phone column.
     <span className={clsx('pill inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-0.5 whitespace-normal text-caption',
       attention ? 'text-warn' : 'text-fg-2', className)}>
-      <span aria-hidden="true" className={clsx('h-1.5 w-1.5 rounded-full', attention ? 'bg-warn' : 'bg-fg-3')} />
+      {status === 'syncing' ? <Spinner size={14} />
+        : <span aria-hidden="true" className={clsx('h-1.5 w-1.5 rounded-full', attention ? 'bg-warn' : 'bg-fg-3')} />}
       <span className="text-fg">{broker}</span>
       {lastSyncedAt && (
         <>

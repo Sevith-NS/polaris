@@ -73,6 +73,15 @@ const DESK = [
   { seat: 'Risk committee', focus: 'Your rules', body: 'Checks the idea against limits you set, like the most one name may take of your book.', src: 'Your rules · your portfolio' },
 ];
 
+// What Ask Polaris reads before it answers (backend ai_assistant._build_context).
+const ASK = [
+  ['The stock on your screen', 'Open a symbol and ask. It reads that stock’s plan levels, quant readings and news mood before it answers.'],
+  ['Your paper portfolio', 'Positions and cash from your paper book, so “how risky is my portfolio” gets your numbers, not a template.'],
+  ['Any company you name', 'Mention another ticker in the question and it pulls that one’s readings too.'],
+  ['Picks up where you left off', 'Every answer is kept in your own history. Reopen a chat later, or delete it.'],
+  ['Explains, never advises', 'It walks you through what the numbers show. It never tells you to buy or sell.'],
+] as const;
+
 const RISK = [
   { label: 'One-day VaR, 95%', title: 'A bad day', note: 'About how much your holdings could lose on a bad day, one day in twenty.' },
   { label: 'Max drawdown', title: 'Deepest fall', note: 'The biggest peak-to-trough drop your holdings took over the period.' },
@@ -97,17 +106,17 @@ function SectionHead({ kicker, title, body, id }: { kicker: string; title: React
 const COMPARE: { row: string; cells: [string, string, string, string] }[] = [
   { row: 'What it is', cells: ['Read-only tracker and paper desk', 'Model portfolios you buy through your broker', 'Research and screener platform', 'Back office for a Zerodha account'] },
   { row: 'Who decides what to buy', cells: ['You. Polaris never recommends', 'SEBI-registered basket managers', 'You. Content is informational', 'You'] },
-  { row: 'SEBI status', cells: ['Not registered; a software tool', 'Managers are registered RAs, RIAs or PMS', 'No RA or IA licence', 'Registered stockbroker'] },
-  { row: 'Price', cells: ['Free during the beta', '₹100 or 1.5% per buy, plus any manager fee', 'Free tier; Pro from ₹399 a month', 'Included with the account'] },
+  { row: 'SEBI status', cells: ['A software tool, not registered', 'Managers are registered RAs, RIAs or PMS', 'No RA or IA licence', 'Registered stockbroker'] },
+  { row: 'Price', cells: ['Free during the beta', '₹100 or 1.5% per buy, plus any manager fee', 'Free tier, Pro from ₹399 a month', 'Included with the account'] },
 ];
 
 const FAQ: [string, ReactNode][] = [
-  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk; Polaris does the arithmetic and shows its working.'],
+  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk. Polaris does the arithmetic and shows its working.'],
   ['Who sets the entry and stop?', 'You do, by choosing the method and your risk per trade. Every formula and every input is on screen, and plans only place paper orders.'],
   ['Where does the data come from, and how old is it?', 'Market data comes from Yahoo Finance and NSE public pages, and news from Google News. Quotes can be delayed. Every figure shows its source and time.'],
-  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else: there is no order button on a real account. The access token is encrypted into a cookie in your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
-  ['How does Polaris make money?', 'It doesn’t yet; it’s free during the beta. We take no commissions from brokers, basket managers or referrals, and no stock is ever featured for pay.'],
-  ['When do US brokers come?', 'US markets are live today. Syncing US broker holdings is planned; until then Polaris says so plainly instead of pretending.'],
+  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else. There is no order button on a real account. The access token is encrypted into a cookie in your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
+  ['How does Polaris make money?', 'It doesn’t yet. It’s free during the beta. We take no commissions from brokers, basket managers or referrals, and no stock is ever featured for pay.'],
+  ['When do US brokers come?', 'US markets are live today. Syncing US broker holdings is planned. Until then Polaris says so plainly instead of pretending.'],
   ['How do I delete my data?', 'Settings → Delete account removes everything Polaris stores, and Settings → Export gives you a copy first.'],
 ];
 
@@ -285,6 +294,22 @@ export default async function Landing() {
                 ))}
               </div>
               </div>
+            </div>
+          </section>
+
+          {/* ---------------------------------------------- ask polaris -- */}
+          <section id="ask" aria-labelledby="ask-h" className={`py-12 md:py-8 ${gutter}`}>
+            <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-2">
+              <SectionHead id="ask-h" kicker="Ask Polaris" title="Ask about what is on your screen."
+                           body="A chat that already knows which stock you have open and what your paper book holds, so you skip the copy and paste." />
+              <ul data-stagger className="flex flex-col">
+                {ASK.map(([t, b]) => (
+                  <li key={t} className="flex gap-4 border-t border-white/10 py-6">
+                    <span aria-hidden="true" className="ring-dot mt-0.5 shrink-0 text-fg" />
+                    <span><span className="block text-h4 font-medium">{t}</span><span className="mt-1 block text-body-sm text-fg-2">{b}</span></span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
 

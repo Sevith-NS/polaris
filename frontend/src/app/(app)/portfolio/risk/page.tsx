@@ -99,7 +99,7 @@ export default function Risk() {
                         explain="Return per unit of risk (Sortino counts only downside swings). Above 1 is good." />
                 {r.beta_vs_sp500 !== null && (
                   <Metric label="Beta vs S&P 500" value={formatNumber(r.beta_vs_sp500, 2)}
-                          explain="How much the book moves with the US market. 1 moves with it; below 1 moves less." />
+                          explain="How much the book moves with the US market. 1 moves with it, and below 1 moves less." />
                 )}
                 <Metric label="Diversification" value={`${formatNumber(r.diversification_score, 0)} of 100`}
                         explain="Higher means money is spread across more holdings rather than piled into one." />
@@ -107,7 +107,7 @@ export default function Risk() {
             )}
           <p className="text-caption text-fg-3">
             {book && book.positions.length > MAX && `Covers your ${MAX} largest holdings. `}
-            {currencies.size > 1 && 'Holdings are weighted in your base currency; currency moves themselves aren’t modelled yet. '}
+            {currencies.size > 1 && 'Holdings are weighted in your base currency. Currency moves themselves aren’t modelled yet. '}
             Past behaviour, not a forecast.
           </p>
         </section>

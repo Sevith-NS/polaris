@@ -83,7 +83,7 @@
 - **MUST** gate every JS animation on `prefers-reduced-motion` (e.g. `gsap.matchMedia()`). CSS animations are covered by the global block in `globals.css`.
 - **MUST NOT** import `locomotive-scroll`, `gsap/ScrollTrigger` or `gsap/SplitText` outside `components/landing/`.
 - **MUST** make anything that starts hidden for a reveal visible without JavaScript and under reduced motion.
-- **MUST NOT** loop animations in the product register (skeleton pulse is the one exception).
+- **MUST NOT** loop animations in the product register (the skeleton pulse and the `Spinner` orbit are the only exceptions).
 
 ## 8. Data, money and honesty
 

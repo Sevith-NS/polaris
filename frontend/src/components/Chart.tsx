@@ -7,8 +7,13 @@ import {
 } from 'lightweight-charts';
 import { ema, bollinger, macd, rsi } from '../lib/indicators';
 import { readStorage, useBrowserValue, writeStorage } from '../lib/browser';
+import { formatNumber } from '../lib/format';
 import { cssVar, tint } from '../lib/theme';
 import { CHART_INTERACTION_FREE, DrawingHint, DrawingRail, useChartDrawings } from './ChartDrawings';
+import { Floating } from './ui/Popover';
+
+/** Alert levels keep cents on normal prices and more places on sub-unit ones (small coins). */
+const alertDigits = (price: number) => (price >= 1 ? 2 : 6);
 
 // ---------------------------------------------------------------------------
 // Indicator configuration
@@ -181,6 +186,8 @@ interface ChartProps {
    */
   visibleBars?: number;
   height?: number;
+  /** Grow past `height` to fill a taller flex parent (a card stretched by its grid row). */
+  fill?: boolean;
   /**
    * Instrument the drawings belong to. Drawings are stored in (time, price)
    * space under this key, so they follow the symbol across timeframe switches
@@ -190,6 +197,8 @@ interface ChartProps {
   symbol?: string;
   /** Set false to drop the drawing rail + overlay (e.g. a thumbnail widget). */
   drawingTools?: boolean;
+  /** When set, a right-click (or long-press) on the price pane offers "Add alert at <price>". */
+  onAddAlert?: (price: number) => void;
   colors?: {
     backgroundColor?: string;
     textColor?: string;
@@ -206,7 +215,7 @@ interface ChartProps {
 }
 
 export default function Chart({
-  data, visibleBars, height = 400, symbol, drawingTools = true, colors = {},
+  data, visibleBars, height = 400, fill = false, symbol, drawingTools = true, colors = {}, onAddAlert,
 }: ChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartWrapRef = useRef<HTMLDivElement>(null);
@@ -214,6 +223,28 @@ export default function Chart({
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const priceLineRefs = useRef<IPriceLine[]>([]);
+
+  const [alertAt, setAlertAt] = useState<{ x: number; y: number; price: number } | null>(null);
+  const alertAnchorRef = useRef<HTMLSpanElement>(null);
+  const alertItemRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => { if (alertAt) alertItemRef.current?.focus(); }, [alertAt]);
+
+  // TradingView's gesture: right-click a price to set an alert there.
+  const onContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    const chart = chartRef.current;
+    const series = seriesRef.current;
+    const wrap = chartWrapRef.current;
+    if (!onAddAlert || !chart || !series || !wrap) return;
+    const box = wrap.getBoundingClientRect();
+    const x = e.clientX - box.left;
+    const y = e.clientY - box.top;
+    // Only the top pane holds prices. The RSI and MACD panes sit under it.
+    if (y > chart.panes()[0].getHeight()) return;
+    const price = series.coordinateToPrice(y);
+    if (price === null || !(price > 0)) return;
+    e.preventDefault();
+    setAlertAt({ x, y, price: Number(price.toFixed(alertDigits(price))) });
+  };
 
   // Saved indicators are read from storage as a browser-only value (defaults
   // on the server and first render, so the HTML matches); an edit wins after.
@@ -557,7 +588,7 @@ export default function Chart({
   }, [colors.priceLines, data, rebuildEpoch]);
 
   return (
-    <div className="relative w-full">
+    <div className={fill ? 'relative flex w-full flex-1 flex-col' : 'relative w-full'}>
       {/* Indicator toolbar */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         {CHIP_META.map(({ key, label, color }) => {
@@ -657,7 +688,8 @@ export default function Chart({
       </div>
       {/* Rail sits outside the chart box so it never overlaps the price axis
           or eats crosshair hits; the chart flexes into whatever's left. */}
-      <div className="flex w-full items-stretch" style={{ height }}>
+      <div className={fill ? 'flex w-full flex-1 items-stretch' : 'flex w-full items-stretch'}
+           style={fill ? { minHeight: height } : { height }}>
         {drawingTools && (
           <DrawingRail
             activeTool={draw.activeTool}
@@ -678,6 +710,7 @@ export default function Chart({
           // which is the only way to get past a full-width chart.
           data-lenis-prevent-wheel=""
           className="relative min-w-0 flex-1"
+          onContextMenu={onContextMenu}
         >
           <div ref={chartContainerRef} className="absolute inset-0" />
           {drawingTools && (
@@ -696,8 +729,22 @@ export default function Chart({
             />
           )}
           {drawingTools && <DrawingHint tool={draw.activeTool} />}
+          {alertAt && (
+            <span ref={alertAnchorRef} aria-hidden="true" className="pointer-events-none absolute"
+                  style={{ left: alertAt.x, top: alertAt.y }} />
+          )}
         </div>
       </div>
+      <Floating open={alertAt !== null} onClose={() => setAlertAt(null)} anchorRef={alertAnchorRef}
+                role="menu" aria-label="Chart actions" className="min-w-48 p-1">
+        {alertAt && (
+          <button ref={alertItemRef} type="button" role="menuitem" onBlur={() => setAlertAt(null)}
+                  onClick={() => { setAlertAt(null); onAddAlert?.(alertAt.price); }}
+                  className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-body-sm text-fg outline-none hover:bg-white/[0.08] focus:bg-white/[0.08]">
+            Add alert at <span className="ml-1 tabular">{formatNumber(alertAt.price, alertDigits(alertAt.price))}</span>
+          </button>
+        )}
+      </Floating>
     </div>
   );
 }

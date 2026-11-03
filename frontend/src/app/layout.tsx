@@ -9,7 +9,7 @@ import './globals.css';
  */
 export const metadata: Metadata = {
   title: { default: 'Polaris', template: '%s · Polaris' },
-  description: 'A paper-trading desk for global markets: plans with entry, stop and size, risk you can read, and an AI desk that shows its work.',
+  description: 'A paper-trading desk for global markets, with plans that set entry, stop and size, risk you can read, and an AI desk that shows its work.',
 };
 
 export const viewport: Viewport = {

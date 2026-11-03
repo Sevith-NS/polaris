@@ -56,6 +56,8 @@ export interface ContextEvent {
   company: string;
   price: number | null;
   rounds: number;
+  /** Epoch seconds when the desk read the data this run explains. */
+  as_of: number;
   /** Five pillars, −1…+1, null when a source is down. Readings, never a call. */
   readings: { pillars: Record<string, number | null> };
   quant: {

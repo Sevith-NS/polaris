@@ -1,8 +1,9 @@
 'use client';
 
-import { Landmark, CandlestickChart, Newspaper, Waves, Users2, Hourglass } from '@/components/ui/icons';
+import { Landmark, CandlestickChart, Newspaper, Waves, Users2 } from '@/components/ui/icons';
 import clsx from 'clsx';
 import type { AnalystEvent } from '../../types/agents';
+import { Skeleton } from '@/components/ui/States';
 import { ANALYST_ORDER, scoreColor } from './deskFormat';
 import { MicroLabel, ScoreBar, SeatError } from './DeskAtoms';
 
@@ -19,6 +20,28 @@ const REMITS: Record<string, string> = {
   news: 'headline flow · outlet spread',
   sentiment: 'flow · positioning · crowd',
 };
+
+/** Same names the backend files under, so a card doesn't change title when it lands. */
+const NAMES: Record<string, string> = {
+  fundamentals: 'Fundamentals Analyst',
+  technical: 'Technical Analyst',
+  news: 'News Analyst',
+  sentiment: 'Sentiment & Flow Analyst',
+};
+
+/** A seat still reading, drawn in the shape of the card it will become. */
+function PendingCard({ role }: { role: string }) {
+  return (
+    <div role="status" aria-label={`${NAMES[role]} is reading`} className="flex flex-col rounded-xl well p-3.5">
+      <div className="flex items-center gap-1.5 text-[12px] font-semibold text-fg-2">
+        <span className="text-fg-3">{ICONS[role]}</span>
+        {NAMES[role]}
+      </div>
+      <MicroLabel className="mt-0.5">{REMITS[role]}</MicroLabel>
+      <Skeleton className="mt-4 h-20 w-full" />
+    </div>
+  );
+}
 
 function AnalystCard({ card }: { card: AnalystEvent }) {
   const color = scoreColor(card.score);
@@ -122,14 +145,7 @@ export default function AnalystCards({
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         {ordered.map((card) => <AnalystCard key={card.role} card={card} />)}
         {pending && ANALYST_ORDER.filter((r) => !cards.some((c) => c.role === r)).map((role) => (
-          <div
-            key={role}
-            className="flex min-h-[140px] items-center justify-center rounded-xl well border-dashed p-3.5"
-          >
-            <span className="flex items-center gap-2 text-caption text-fg-3">
-              <Hourglass size={12} className="" /> reading {role}…
-            </span>
-          </div>
+          <PendingCard key={role} role={role} />
         ))}
       </div>
     </div>

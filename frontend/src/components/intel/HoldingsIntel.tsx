@@ -51,7 +51,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
       {loading && data.length === 0 ? (
         <p className="text-sm text-fg-2">
           Sweeping news sources and statements for {positions.length} holding{positions.length > 1 ? 's' : ''}.
-          The first run takes about 10 seconds per symbol; later runs are cached.
+          The first run takes about 10 seconds per symbol. Later runs are cached.
         </p>
       ) : error ? (
         <p className="text-sm text-down">{error}</p>
@@ -62,7 +62,7 @@ export default function HoldingsIntel({ positions }: { positions: { symbol: stri
               return (
                 <div key={h.symbol} className="rounded-xl well p-4">
                   <div className="ticker text-fg">{h.symbol}</div>
-                  <p className="mt-1 text-xs text-fg-3">Intel unavailable: {h.error}</p>
+                  <p className="mt-1 text-xs text-fg-3">Intel unavailable. {h.error}</p>
                 </div>
               );
             }

@@ -58,7 +58,7 @@ export function PlanSummary({ quant, currency, size, baseCurrency, riskPct, onTr
         </dl>
       )}
       {size?.cappedByCash && <p className="text-caption text-warn">Cash limits this size below your risk budget.</p>}
-      <p className="text-caption text-fg-3">Levels computed from price history by a published formula. Not a recommendation; you decide whether to trade.</p>
+      <p className="text-caption text-fg-3">Levels computed from price history by a published formula. Not a recommendation. You decide whether to trade.</p>
       <Button onClick={onTrade} disabled={!canTrade}>Paper trade</Button>
     </section>
   );

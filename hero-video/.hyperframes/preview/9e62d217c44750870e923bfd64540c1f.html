@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-resolution="landscape-4k">
+  <head><script data-hf-gsap-fallback>
+(function(){
+  var cdnBase="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/";
+  var loaded={};
+  function loadFallback(file){
+    if(loaded[file])return loaded[file];
+    return loaded[file]=new Promise(function(ok,fail){
+      var s=document.createElement("script");
+      s.src=cdnBase+file;s.hfGsapFallback=true;s.onload=ok;s.onerror=fail;
+      document.head.appendChild(s);
+    });
+  }
+  document.addEventListener("error",function(e){
+    var t=e.target;
+    if(!t||t.tagName!=="SCRIPT"||!t.src||t.hfGsapFallback)return;
+    var m=t.src.match(/gsap[^/]*\/dist\/(.+\.js)/);
+    if(m)loadFallback(m[1]).catch(function(){
+      reportError(new Error("GSAP could not load from "+t.src+" or "+cdnBase+m[1]+", so this preview's animations will not play."));
+    });
+  },true);
+})();
+</script>
+<meta name="hyperframes-studio-preview"><script>(function(){var seen=window.__hfPreviewErrors=[];
+addEventListener("error",function(e){seen.push(e.message||String(e))});})();</script>
+<base href="/api/projects/hero-video/preview/"><style data-hyperframes-text-rendering="true">html,body,*{text-rendering:geometricPrecision}</style><script data-hf-after-fonts-fallback="">document.addEventListener("DOMContentLoaded", function () {
+  if (window.__hfAfterFontsClaimed) return;
+  var T = "text/hf-after-fonts";
+  var all = [].slice.call(document.querySelectorAll('script[type="text/hf-after-fonts"], script[type="text/hf-after-fonts+module"]'));
+  if (!all.length) return;
+  console.warn("[hyperframes] the runtime has no web-font gate; composition scripts run without waiting for fonts");
+  var late = function (el) { return el.type !== T || el.matches('[defer][src], [defer][data-hf-inlined-src]'); };
+  var queue = all.filter(function (el) { return !late(el); }).concat(all.filter(late));
+  (function next() {
+    var el = queue.shift();
+    if (!el) return;
+    var s = document.createElement("script");
+    for (var i = 0; i < el.attributes.length; i++) s.setAttribute(el.attributes[i].name, el.attributes[i].value);
+    if (el.type === T) s.removeAttribute("type"); else s.type = "module";
+    s.async = el.hasAttribute("async");
+    s.text = el.text;
+    var waits = s.type !== "module" && s.hasAttribute("src") && !s.async && !s.noModule;
+    if (waits) { s.addEventListener("load", next); s.addEventListener("error", next); }
+    el.replaceWith(s);
+    if (!waits) next();
+  })();
+});
+//# sourceURL=hyperframes://after-fonts-fallback</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=3840, height=2160">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 3840px;
+        height: 2160px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      #silk {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    </style>
+  
+<script data-hyperframes-preview-runtime="1" src="/api/runtime.js"></script>
+<meta name="hyperframes-project-signature" content="b37a60a68718612539ee357d">
+</head>
+  <body>
+    <!-- The landing's background loop: silk ribbons of light on black, drawn by
+         one fragment shader. No grain here: the page lays its own over the video. -->
+    <div data-hf-id="hf-pasz" id="root" data-composition-id="main" data-start="0" data-duration="20" data-width="3840" data-height="2160">
+      <canvas data-hf-id="hf-pyik" id="silk" width="3840" height="2160"></canvas>
+    </div>
+
+    
+
+    
+  <script type="text/hf-after-fonts">const FRAG = `
+      precision highp float;
+      uniform vec2 uRes;
+      // 2\u03C0\xB7t/T. Every moving term uses a whole multiple of it, so frame T is frame 0.
+      uniform float uPhase;
+
+      float erf1(float x) { // Abramowitz\u2013Stegun 7.1.26, error < 1.5e-7
+        float s = sign(x);
+        x = abs(x);
+        float t = 1.0 / (1.0 + 0.3275911 * x);
+        float y = 1.0 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * exp(-x * x);
+        return s * y;
+      }
+
+      float gauss(float x, float s) { return exp(-0.5 * x * x / (s * s)) * 0.39894228 / s; }
+
+      const int STRIPS = 24;
+      const float FOCUS = -0.2; // depth in sharp focus; farther and nearer blur
+
+      // Brightness of the silk where it faces angle th: lit from above, back face dimmer.
+      float lightAt(float th) {
+        float nl = 0.44 * cos(th) - 0.9 * sin(th);
+        return 0.05 + (nl > 0.0 ? 0.95 * pow(nl, 1.8) : 0.3 * pow(-nl, 1.5));
+      }
+
+      // One silk ribbon across the frame. Its cross-section is a curved strip cut
+      // into STRIPS pieces; each piece is a ramp of light blurred by its own depth's
+      // Gaussian, summed exactly (erf). Where the curl passes edge-on the strip folds
+      // over itself, and the pieces' sheen piles up into the bright crease.
+      float ribbon(vec2 p, float seed, float yBase, float width) {
+        float x = p.x;
+        float a = uPhase;
+        float yc = yBase + 0.24 * sin(1.5 * x + a + seed) + 0.10 * sin(2.6 * x - 2.0 * a + 1.7 * seed) + 0.03 * sin(4.1 * x + 3.0 * a + 0.6);
+        float dy = 0.36 * cos(1.5 * x + a + seed) + 0.26 * cos(2.6 * x - 2.0 * a + 1.7 * seed) + 0.123 * cos(4.1 * x + 3.0 * a + 0.6);
+        float zc = 0.6 * sin(1.0 * x - a + 2.0 * seed) + 0.25 * sin(1.9 * x + 2.0 * a + seed); // > 0 is farther
+        // Twist at the centre line; it only passes edge-on near its peaks, so the
+        // ribbon folds instead of pinching. The +a terms make the folds travel.
+        float t0 = 0.35 + 0.8 * sin(1.3 * x + a + seed) + 0.3 * sin(2.9 * x - 2.0 * a + 0.7);
+        float k = 1.5; // curl across the half-width, radians: the crease runs diagonally
+        float g = 1.0 / (1.0 + 0.4 * zc); // nearer = wider and brighter
+        float wg = width * g;
+        float d = (p.y - yc) / sqrt(1.0 + dy * dy);
+        float acc = 0.0;
+        // Each edge of a piece: its height on screen and the silk's brightness there.
+        float y0 = wg * (sin(t0 - k) - sin(t0)) / k;
+        float b0 = lightAt(t0 - k) * (1.0 - smoothstep(0.8, 1.0, 1.0));
+        for (int i = 0; i < STRIPS; i++) {
+          float v1 = -1.0 + 2.0 * float(i + 1) / float(STRIPS);
+          float vm = v1 - 1.0 / float(STRIPS);
+          float th = t0 + k * vm;
+          float y1 = wg * (sin(t0 + k * v1) - sin(t0)) / k;
+          float b1 = lightAt(t0 + k * v1) * (1.0 - smoothstep(0.8, 1.0, abs(v1))); // soft edges
+          float z = zc + wg * (cos(t0) - cos(th)) / k;
+          float s = 0.0035 + 0.035 * abs(z - FOCUS); // depth of field
+          float c = abs(cos(th));
+          // The silk's sheen: only at grazing angles, where it piles up into the crease.
+          float sheen = 0.35 * (1.0 - c) * (1.0 - c) * (2.0 * wg / float(STRIPS)) * (1.0 - smoothstep(0.8, 1.0, abs(vm)));
+          bool up = y1 >= y0;
+          float lo = up ? y0 : y1;
+          float hi = up ? y1 : y0;
+          float blo = up ? b0 : b1;
+          float bhi = up ? b1 : b0;
+          float span = hi - lo;
+          if (span < 0.05 * s) {
+            acc += (0.5 * (blo + bhi) * span + sheen) * gauss(d - 0.5 * (lo + hi), s); // edge-on: a thin line
+          } else {
+            float e = 0.5 * (erf1((d - lo) * 0.70710678 / s) - erf1((d - hi) * 0.70710678 / s));
+            float ramp = (d - lo) * e - s * s * (gauss(d - hi, s) - gauss(d - lo, s)); // brightness changes linearly across the piece
+            acc += blo * e + (bhi - blo) / span * ramp + sheen * e / span;
+          }
+          y0 = y1;
+          b0 = b1;
+        }
+        return acc * pow(clamp(g, 0.6, 1.4), 0.7);
+      }
+
+      // How close p is to the ribbon, for the dust that hangs around it.
+      float near(vec2 p, float seed, float yBase, float width) {
+        float yc = yBase + 0.24 * sin(1.5 * p.x + uPhase + seed);
+        return exp(-0.5 * (p.y - yc) * (p.y - yc) / ((width + 0.25) * (width + 0.25)));
+      }
+
+      float hash(vec2 q) { return fract(sin(dot(q, vec2(127.1, 311.7))) * 43758.5453); }
+
+      // Sparse dust: one speck in some cells, drifting a small circle once per loop.
+      float specks(vec2 p) {
+        vec2 grid = p * 18.0;
+        vec2 id = floor(grid);
+        float acc = 0.0;
+        for (int j = -1; j <= 1; j++) {
+          for (int i = -1; i <= 1; i++) {
+            vec2 cid = id + vec2(float(i), float(j));
+            if (hash(cid) < 0.55) continue;
+            float ph = hash(cid + 3.7) * 6.2831853;
+            vec2 pos = cid + vec2(hash(cid + 1.3), hash(cid + 7.1)) + 0.25 * vec2(cos(uPhase + ph), sin(uPhase + ph));
+            float b = pow(hash(cid + 5.9), 4.0) * (0.55 + 0.45 * sin(2.0 * uPhase + ph));
+            vec2 q = grid - pos;
+            acc += b * exp(-dot(q, q) / 0.0032);
+          }
+        }
+        return acc;
+      }
+
+      void main() {
+        vec2 p = (2.0 * gl_FragCoord.xy - uRes) / uRes.y; // y in [-1, 1]
+        float l = ribbon(p, 0.0, 0.08, 0.55);
+        l += 0.6 * specks(p) * (0.15 + 1.2 * near(p, 0.0, 0.08, 0.4));
+        l *= 1.0 - 0.35 * smoothstep(0.6, 1.6, length(p * vec2(0.62, 1.0)));
+        vec3 col = pow(vec3(1.0 - exp(-1.1 * l)), vec3(1.0 / 2.2));
+        col += (hash(gl_FragCoord.xy) - 0.5) / 255.0; // static dither against banding
+        gl_FragColor = vec4(col, 1.0);
+      }`;
+const LOOP = 20;
+const canvas = document.getElementById("silk");
+const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true, antialias: false });
+const shader = (type, src) => {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+};
+const prog = gl.createProgram();
+gl.attachShader(prog, shader(gl.VERTEX_SHADER, "attribute vec2 pos; void main() { gl_Position = vec4(pos, 0.0, 1.0); }"));
+gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, FRAG));
+gl.linkProgram(prog);
+if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+gl.useProgram(prog);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+const posLoc = gl.getAttribLocation(prog, "pos");
+gl.enableVertexAttribArray(posLoc);
+gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+gl.viewport(0, 0, canvas.width, canvas.height);
+gl.uniform2f(gl.getUniformLocation(prog, "uRes"), canvas.width, canvas.height);
+const uPhase = gl.getUniformLocation(prog, "uPhase");
+function renderAt(t) {
+  gl.uniform1f(uPhase, 2 * Math.PI * t / LOOP);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.finish();
+}
+window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+renderAt(0);
+window.__timelines["main"] = gsap.timeline({ paused: true });</script></body>
+</html>

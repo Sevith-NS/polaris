@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
 import {
-  Building2, Play, Square, WifiOff, CircleDot, Check, Timer, BookOpen, Shuffle,
+  Building2, Play, Square, WifiOff, Timer, BookOpen, Shuffle,
 } from '@/components/ui/icons';
 import type {
   AnalystEvent, ContextEvent, DebateEvent, DeskEvent, DeskStage, RulesEvent, SummaryEvent,
@@ -13,13 +12,10 @@ import { usePortfolio } from '../../context/PortfolioContext';
 import { formatMoney } from '../../lib/format';
 import AnalystCards from './AnalystCards';
 import DebateTranscript from './DebateTranscript';
-import SummaryPanel from './SummaryPanel';
+import SummaryPanel, { SummaryPending } from './SummaryPanel';
 import RulesPanel from './RulesPanel';
 import DeskNotes from './DeskNotes';
-import { MicroLabel } from './DeskAtoms';
-import { STAGE_LABELS, STAGE_ORDER } from './deskFormat';
-
-const ROUND_OPTIONS = [1, 2, 3, 4];
+import DeskProgress from './DeskProgress';
 
 interface DeskState {
   context: ContextEvent | null;
@@ -33,52 +29,16 @@ interface DeskState {
   /** Set when the run left Gemini mid-flight because its quota was exhausted. */
   failover: string | null;
   fallbackCalls: number;
+  /** Epoch ms of the click and of each stage's first status event, for the progress clock. */
+  startedAt: number | null;
+  stageStarts: Partial<Record<DeskStage, number>>;
 }
 
 const EMPTY: DeskState = {
   context: null, analysts: [], debate: [], summary: null, rules: null,
   stage: null, message: '', elapsedMs: null, failover: null, fallbackCalls: 0,
+  startedAt: null, stageStarts: {},
 };
-
-/** The stage rail: which seats have reported, which one is speaking now. */
-function StageRail({ stage, message, running }: {
-  stage: DeskStage | null; message: string; running: boolean;
-}) {
-  const currentIndex = stage ? STAGE_ORDER.indexOf(stage) : -1;
-  return (
-    <div className="rounded-xl well p-4">
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-        {STAGE_ORDER.map((key, i) => {
-          const done = i < currentIndex || (!running && currentIndex === STAGE_ORDER.length - 1 && i <= currentIndex);
-          const active = running && i === currentIndex;
-          return (
-            <div key={key} className="flex items-center gap-2">
-              <span
-                className={clsx(
-                  'flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-caption transition-colors',
-                  active ? 'bg-fg text-ink-0'
-                    : done ? 'text-up'
-                    : 'text-fg-3',
-                )}
-              >
-                {done ? <Check size={10} />
-                  : active ? <CircleDot size={10} />
-                  : <CircleDot size={10} className="opacity-40" />}
-                {STAGE_LABELS[key]}
-              </span>
-              {i < STAGE_ORDER.length - 1 && <span className="text-fg-3/40">·</span>}
-            </div>
-          );
-        })}
-      </div>
-      {message && (
-        <p className="mt-2.5 border-t border-line pt-2.5 text-[12px] text-fg-2">
-          {message}
-        </p>
-      )}
-    </div>
-  );
-}
 
 /**
  * The research desk: four analysts read a symbol separately, the case for
@@ -91,7 +51,6 @@ export default function TradingDeskSection({
   symbol, currency,
 }: { symbol: string; currency: string }) {
   const [state, setState] = useState<DeskState>(EMPTY);
-  const [rounds, setRounds] = useState(2);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
   const [notesKey, setNotesKey] = useState(0);
@@ -113,10 +72,14 @@ export default function TradingDeskSection({
   useEffect(() => () => { abortRef.current?.abort(); abortRef.current = null; }, [symbol]);
 
   const apply = useCallback((event: DeskEvent) => {
+    const at = Date.now();
     setState((prev) => {
       switch (event.type) {
         case 'status':
-          return { ...prev, stage: event.stage, message: event.message };
+          return {
+            ...prev, stage: event.stage, message: event.message,
+            stageStarts: prev.stageStarts[event.stage] ? prev.stageStarts : { ...prev.stageStarts, [event.stage]: at },
+          };
         case 'context':
           return { ...prev, context: event };
         case 'analyst':
@@ -151,11 +114,12 @@ export default function TradingDeskSection({
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setState({ ...EMPTY, stage: 'gather' });
+    const at = Date.now();
+    setState({ ...EMPTY, stage: 'gather', startedAt: at, stageStarts: { gather: at } });
     setError('');
     setRunning(true);
     try {
-      await streamDesk({ symbol, rounds, portfolio: { balance, positions } }, apply, controller.signal);
+      await streamDesk({ symbol, portfolio: { balance, positions } }, apply, controller.signal);
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') return; // user stopped it, or the symbol changed
       setError(
@@ -190,34 +154,15 @@ export default function TradingDeskSection({
               </span>
             </h3>
             <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-fg-2">
-              Four analysts read {symbol} separately, the case for strength and the case for caution
-              argue it over {rounds} {rounds === 1 ? 'round' : 'rounds'}, and a balanced summary explains
-              the data and how the plan&apos;s levels were computed. &ldquo;Your rules&rdquo; then works out
-              what your own risk setting implies. Every figure comes from this platform&apos;s engines. The
-              desk explains; it never tells you what to do.
+              Four analysts read {symbol} separately. The case for strength opens and the case for
+              caution answers it, then a balanced summary explains the data and how the plan&apos;s levels
+              were computed. &ldquo;Your rules&rdquo; then works out what your own risk setting implies.
+              Every figure comes from this platform&apos;s engines. The desk explains. It never tells you
+              what to do.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div>
-              <MicroLabel className="mb-1">Debate rounds</MicroLabel>
-              <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
-                {ROUND_OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setRounds(option)}
-                    disabled={running}
-                    className={clsx(
-                      'min-h-8 px-2.5 text-caption font-semibold tabular transition-colors disabled:opacity-50',
-                      rounds === option ? 'bg-fg text-ink-0' : 'text-fg-3 hover:text-fg-2',
-                    )}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {running ? (
               <button
                 onClick={stop}
@@ -269,6 +214,14 @@ export default function TradingDeskSection({
                 <Timer size={11} /> {(state.elapsedMs / 1000).toFixed(1)}s
               </span>
             )}
+            {context.as_of && (
+              <span>
+                data as of{' '}
+                <span className="tabular text-fg-2">
+                  {new Date(context.as_of * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                </span>
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -297,18 +250,27 @@ export default function TradingDeskSection({
         </div>
       )}
 
-      {running && <StageRail stage={state.stage} message={state.message} running={running} />}
+      {running && state.startedAt !== null && (
+        <DeskProgress
+          symbol={symbol}
+          stage={state.stage}
+          message={state.message}
+          startedAt={state.startedAt}
+          stageStarts={state.stageStarts}
+          analysts={analysts}
+          debate={debate}
+        />
+      )}
 
       {/* ---- The run, in the order it happened ---- */}
       <AnalystCards cards={analysts} pending={running && analysts.length < 4} />
 
       <DebateTranscript
         turns={debate}
-        rounds={context?.rounds ?? rounds}
         pending={running && Boolean(context) && analysts.length === 4 && !summary}
       />
 
-      {summary && <SummaryPanel summary={summary} />}
+      {summary ? <SummaryPanel summary={summary} /> : running && debate.length >= 2 && <SummaryPending />}
       {rules && <RulesPanel rules={rules} currency={currency} />}
 
       {/* ---- Notes ---- */}
@@ -320,7 +282,7 @@ export default function TradingDeskSection({
           className="glass rounded-xl flex w-full items-center justify-center gap-2 p-4 text-xs font-semibold text-fg-2 transition-colors hover:text-fg"
         >
           <BookOpen size={14} className="text-fg-2" />
-          Show desk notes: what each past run explained
+          Show desk notes from past runs
         </button>
       )}
     </div>

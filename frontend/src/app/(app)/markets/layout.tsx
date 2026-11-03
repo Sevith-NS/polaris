@@ -9,7 +9,7 @@ export default function MarketsLayout({ children }: { children: ReactNode }) {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <h1 className="text-silver text-h2 font-normal tracking-[-0.03em] md:text-[40px] md:leading-[44px]">Markets</h1>
-        <p className="text-body-sm text-fg-2">Candidates, not calls. Delayed data; paper trading only.</p>
+        <p className="text-body-sm text-fg-2">Candidates, not calls. Prices are delayed and all trading here is paper.</p>
       </div>
       <MarketsTabs />
       {children}

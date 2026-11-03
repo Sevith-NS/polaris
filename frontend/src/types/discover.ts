@@ -14,7 +14,7 @@ export interface UniverseMeta {
   id: string;
   label: string;
   count: number;
-  /** Option group in the picker: "US" | "India" | "Global" | "Crypto" | "Commodities". */
+  /** Option group in the picker, such as "US", "India", "Bonds" or "Crypto". */
   group?: string;
   /**
    * false when a dynamically-built universe (the NIFTY index families) could
@@ -91,6 +91,8 @@ export interface ScreenMeta {
 export interface ScreensListResponse {
   screens: ScreenMeta[];
   categories: string[];
+  /** Picker payload, so the Screens tab lists every universe before a scan runs. */
+  universes?: UniverseMeta[];
 }
 
 export interface ScreenColumn {

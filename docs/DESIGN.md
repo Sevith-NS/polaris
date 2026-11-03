@@ -51,7 +51,7 @@ Both registers share every token in this file. They differ only in motion and sp
 | Bold 700 display | Regular 400 display with tight tracking and a silver sheen | Matches the reference; quieter and more expensive |
 | Top nav | Sidebar (desktop) + bottom tabs (phone), both glass | Room for Watchlists and Alerts |
 | Landing in a light print palette | Landing in the same dark glass system | One consistent product |
-| Lucide banned, custom glyphs | Custom glyph set stays (`components/ui/icons.tsx`) | Unchanged |
+| Lucide banned, custom glyphs | iOS-style Iconoir outline glyphs, vendored into `components/ui/icons.tsx` (2026-11-03) | Owner asked for an iOS look; free SVG, no package |
 
 ### 1.4 Still banned
 
@@ -234,7 +234,8 @@ Minimum target 44×44 everywhere (`min-h-11`). Compact table rows (36px) are all
 
 ## 5. Iconography
 
-- The custom set in `src/components/ui/icons.tsx`: 16px grid, 1.5px stroke, square caps. Sizes 16 (inline), 20 (nav, buttons). Add a glyph there rather than importing a library.
+- The set in `src/components/ui/icons.tsx`: iOS-style outline glyphs from Iconoir (MIT, paths vendored into the file, no package), 24px grid, 1.5px stroke, round caps and joins. Sizes 16 (inline), 20 (nav, buttons). Add a glyph there, taken from Iconoir so the style stays one family, rather than importing a library.
+- Loading spinner: `ui/Spinner.tsx`, the Polaris mark with its rings turning around the fixed star, in `currentColor`. It replaces generic spinners (buttons, Movers, Ask Polaris); data blocks still load with skeletons.
 - Text labels come first. An icon appears where it does a job (navigation, close, search, direction, a tool) and always has a text label or `aria-label`.
 - Decorative icons get `aria-hidden="true"`.
 - No emoji anywhere.
@@ -269,7 +270,7 @@ Animate only `transform` and `opacity` (plus `color` and `background-color` for 
 1. Hover and press feedback (120ms).
 2. Overlay enter and exit: popover fade + 4px rise; sheet slide from its edge; dialog fade + 0.98→1 scale.
 3. **Price tick:** changed digits flash `up` or `down` and fade to `fg` over 600ms.
-4. Skeleton pulse while loading (1.6s, opacity only).
+4. Skeleton pulse while loading (1.6s, opacity only). The `Spinner` rings orbit while something is working (2.4s, 1.6s reversed, 3.2s, rotation only; still under reduced motion).
 5. First-load stagger for **card grids only** (not tables): at most 8 items, 40ms apart, 8px rise + fade, 200ms each.
 6. Sidebar collapse (320ms).
 7. Tab underline slides between tabs (200ms).
@@ -315,8 +316,8 @@ Every interactive component has six states: default, hover, focus-visible, activ
 | Component | Spec |
 |---|---|
 | `Field` | Visible label above (`text-body-sm` `fg-2`), control, then hint or error below (`text-caption`, error in `down` with an icon). Wired with `aria-describedby`. |
-| `Input` / `Select` / `Textarea` | `black/30` fill, 1px `control/70` border, radius 2, 44px tall, 16px text on phone. Focus: white border plus the white ring. |
-| `Segmented` | Track in `ink-2` (radius 2); the selected segment is `fg` white with `ink-0` text, like a primary button. Used for period pickers (1D 1W 1M 1Y All), Real/Paper and currency. |
+| `Input` / `Select` / `Textarea` | `black/30` fill, 1px `control/70` border, radius 2, 44px tall, 16px text on phone. Focus: white border plus the white ring. `Select` (`ui/Select`) draws its list in `glass-2`; never the native list, which the OS paints grey. |
+| `Segmented` | Single choice, radiogroup keys. Capsule chips that wrap on a phone (v4, 2026-10-28); the selected chip is `fg` white with `ink-0` text, like a primary button. Used for boards, thresholds and filters. |
 | `Switch` | 44px hit area; `up` when on, plus an "On"/"Off" text label. |
 | `Search` | Opens the command palette; shows a `Ctrl K` hint on `lg`+. |
 
@@ -431,12 +432,12 @@ Header (symbol, name, exchange, currency, session, Price, Change, watchlist togg
 
 ### 9.4 Markets
 
-Tabs: Overview · Movers · Ideas · Levels · Screens, with an India / US segmented control.
+Tabs: Overview · Movers · Ideas · Levels · Screens. One universe picker, kept in `?u=` and carried by the tabs; Movers is NSE only and has its own Stocks picker. Method notes sit behind "How this works".
 
 ### 9.5 Watchlists, Alerts, News, Settings
 
 - **Watchlists:** a list rail with the named lists and a DataTable with sparklines.
-- **Alerts:** active / triggered / paused tabs; create via a sheet.
+- **Alerts:** Scheduled (active and paused) and Triggered (the firing log) tabs. Create via a sheet, or right-click a price on any chart; live price alerts draw on the chart as dashed lines.
 - **News:** For you (holdings + watchlist) and Markets, with tone tags.
 - **Settings:** Profile, Security (Clerk), Brokers (connections with sync state, reconnect, disconnect), Preferences (base currency, density, reduced motion), Data and privacy.
 

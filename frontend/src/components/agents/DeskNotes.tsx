@@ -14,7 +14,7 @@ function Row({ entry, onDelete }: { entry: JournalEntry; onDelete: (id: string) 
     <div className="flex flex-col gap-2 border-t border-line py-3 first:border-t-0 sm:flex-row sm:items-start sm:gap-4">
       <div className="flex min-w-0 shrink-0 flex-col sm:w-36">
         <span className="ticker text-[13px] font-semibold text-fg">{entry.symbol}</span>
-        <span className="text-caption text-fg-3">{entry.date} · {entry.rounds} {entry.rounds === 1 ? 'round' : 'rounds'}</span>
+        <span className="text-caption text-fg-3">{entry.date}</span>
       </div>
 
       <div className="min-w-0 flex-1">
@@ -128,7 +128,7 @@ export default function DeskNotes({
       {!error && entries.length === 0 && !loading && (
         <p className="flex items-center gap-2 text-[12px] text-fg-3">
           <Target size={13} />
-          No notes yet. Each desk run keeps one here: its summary and what it said to watch.
+          No notes yet. Each desk run keeps one here with its summary and what it said to watch.
         </p>
       )}
 

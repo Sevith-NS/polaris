@@ -1,20 +1,27 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-import {
-  ChevronDown, FlaskConical, History, Play, RotateCw, Settings2, ShieldCheck, Square,
-} from '@/components/ui/icons';
+import { ChevronDown } from '@/components/ui/icons';
+import { Spinner } from '@/components/ui/Spinner';
 import type { BacktestResult, StrategyInfo } from '../../types/backtest';
 import {
   BACKTEST_INTERVALS, BacktestRequest, fetchStrategies, runBacktest,
 } from '../../lib/backtest';
-import { MicroLabel } from '../agents/DeskAtoms';
+import { formatNumber } from '../../lib/format';
+import { Button } from '../ui/Button';
+import { Field as UiField, inputClass } from '../ui/Field';
+import { Segmented } from '../ui/Segmented';
+import { Select } from '../ui/Select';
 import BacktestResults from './BacktestResults';
 import BacktestLab from './BacktestLab';
 import { MonteCarloPanel, OosPanel } from './RobustnessPanels';
 
 type Tab = 'report' | 'robustness' | 'lab';
+
+const HOLD_OUT = [
+  { id: 'off', label: 'Off' }, { id: '0.2', label: '20%' }, { id: '0.3', label: '30%' }, { id: '0.4', label: '40%' },
+];
 
 /**
  * Date presets, as an offset in years from today. `null` is everything the
@@ -40,36 +47,55 @@ function yearsAgo(n: number): string {
   return iso(d);
 }
 
+/** A visible caption over a control that names itself (Select and Segmented take `label`). */
 function Field({ label, children, hint }: {
   label: string; children: React.ReactNode; hint?: string;
 }) {
   return (
-    <div>
-      <MicroLabel className="mb-1">{label}</MicroLabel>
+    <div className="flex flex-col gap-1.5">
+      <span aria-hidden="true" className="text-table text-fg-2">{label}</span>
       {children}
-      {hint && <p className="mt-0.5 text-caption text-fg-3">{hint}</p>}
+      {hint && <p className="text-caption text-fg-3">{hint}</p>}
     </div>
   );
 }
-
-const inputClass =
-  'min-h-9 w-full rounded-lg border border-white/15 bg-black/30 px-2.5 text-[12px] tabular text-fg transition-colors hover:border-line-strong focus:border-fg-2/50';
 
 function NumberField({ label, value, onChange, step = 1, placeholder, hint }: {
   label: string; value: number | null; onChange: (v: number | null) => void;
   step?: number | 'any'; placeholder?: string; hint?: string;
 }) {
+  const id = useId();
   return (
-    <Field label={label} hint={hint}>
+    <UiField id={id} label={label} hint={hint}>
       <input
+        id={id}
         type="number"
         step={step}
         value={value ?? ''}
         placeholder={placeholder ?? 'off'}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
         className={inputClass}
       />
-    </Field>
+    </UiField>
+  );
+}
+
+/** A section that opens below its own button, with the state announced. */
+function Disclosure({ id, open, onToggle, children }: {
+  id: string; open: boolean; onToggle: () => void; children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-expanded={open}
+      aria-controls={id}
+      onClick={onToggle}
+      className="flex min-h-11 items-center gap-1.5 text-body-sm text-fg-2 transition-colors hover:text-fg"
+    >
+      {children}
+      <ChevronDown size={14} aria-hidden="true" className={clsx('transition-transform duration-fast', open && 'rotate-180')} />
+    </button>
   );
 }
 
@@ -194,10 +220,10 @@ export default function BacktestSection({ symbol, currency }: {
   const intervalMeta = BACKTEST_INTERVALS.find((t) => t.id === interval);
   const ownCosts = strategy?.costs?.commission_bps != null;
 
-  const TABS: { id: Tab; label: string; icon: React.ReactNode; enabled: boolean }[] = [
-    { id: 'report', label: 'Report', icon: <History size={12} />, enabled: !!result },
-    { id: 'robustness', label: 'Robustness', icon: <ShieldCheck size={12} />, enabled: !!result },
-    { id: 'lab', label: 'Optimizer & walk-forward', icon: <FlaskConical size={12} />, enabled: !!strategy },
+  const TABS: { id: Tab; label: string; enabled: boolean }[] = [
+    { id: 'report', label: 'Report', enabled: !!result },
+    { id: 'robustness', label: 'Robustness', enabled: !!result },
+    { id: 'lab', label: 'Optimizer and walk-forward', enabled: !!strategy },
   ];
 
   return (
@@ -206,142 +232,81 @@ export default function BacktestSection({ symbol, currency }: {
       <div className="glass rounded-xl p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-fg">
-              <History size={15} className="text-fg-2" /> Backtest
-              <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
-                full history · costs · walk-forward
-              </span>
-            </h3>
-            <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-fg-2">
-              Runs on every bar Yahoo has for {symbol}, decades on daily. Signals form at a
-              bar&apos;s close and fill at the next open, commission and slippage are charged on
-              both sides, and when one bar holds both a stop and a target the stop is assumed to
-              have hit first.
+            <h3 className="text-h4 text-fg">Backtest</h3>
+            <p className="mt-1 max-w-prose text-body-sm text-fg-2">
+              Test a strategy on every bar Yahoo has for {symbol}. Signals form at a bar&apos;s close and
+              fill at the next open, costs are charged both ways, and when one bar hits both a stop and a
+              target the stop counts first.
             </p>
           </div>
 
           {running ? (
-            <button
-              type="button"
-              onClick={stop}
-              className="flex min-h-11 items-center gap-2 rounded-sm border border-white/25 bg-black/30 px-4 text-xs font-semibold text-fg-2 transition-colors hover:text-fg"
-            >
-              <Square size={13} /> Stop
-            </button>
+            <Button variant="secondary" onClick={stop}>Stop</Button>
           ) : (
-            <button
-              type="button"
-              onClick={run}
-              disabled={!strategies.length}
-              className="flex min-h-11 items-center gap-2 rounded-lg border border-fg-2/30 bg-fg-2/5 px-4 text-xs font-semibold text-fg-2 transition-colors hover:bg-fg-2/10 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {result ? <RotateCw size={13} /> : <Play size={13} />}
+            <Button onClick={run} disabled={!strategies.length}>
               {result ? 'Run again' : `Backtest ${symbol}`}
-            </button>
+            </Button>
           )}
         </div>
 
         {/* ---- Primary controls ---- */}
-        <div className="mt-4 grid grid-cols-1 gap-3 border-t border-line pt-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid grid-cols-1 gap-x-4 gap-y-5 border-t border-line pt-5 md:grid-cols-2">
           <Field label="Strategy" hint={strategy?.doc}>
-            <select
+            <Select
+              label="Strategy"
               value={strategyName}
-              onChange={(e) => {
-                setStrategyName(e.target.value);
+              onChange={(v) => {
+                setStrategyName(v);
                 // Parameters belong to a strategy: never carry a stale
                 // `fast=10` onto something with no `fast` at all.
                 setParams({});
               }}
-              className={inputClass}
-            >
-              {strategies.map((s) => (
-                <option key={s.name} value={s.name}>{s.name}</option>
-              ))}
-            </select>
+              options={strategies.map((s) => ({ value: s.name, label: s.name }))}
+            />
           </Field>
 
           <Field label="Interval" hint={intervalMeta?.coverage}>
-            <select
-              value={interval}
-              onChange={(e) => setInterval(e.target.value)}
-              className={inputClass}
-            >
-              {BACKTEST_INTERVALS.map((t) => (
-                <option key={t.id} value={t.id}>{t.label}</option>
-              ))}
-            </select>
+            <Select label="Interval" value={interval} onChange={setInterval}
+                    options={BACKTEST_INTERVALS.map((t) => ({ value: t.id, label: t.label }))} />
           </Field>
 
           <Field
             label="Date range"
             hint={result?.range_clamped
-              ? `Clamped to ${result.range} ; the interval cannot reach further back`
+              ? `Limited to ${result.range} because this interval cannot reach further back`
               : undefined}
           >
-            <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
-              {RANGES.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => setRangeId(r.id)}
-                  className={clsx(
-                    'min-h-9 flex-1 px-1.5 text-caption font-semibold transition-colors',
-                    rangeId === r.id ? 'bg-fg text-ink-0'
-                      : 'text-fg-3 hover:text-fg-2',
-                  )}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
+            <Segmented label="Date range" value={rangeId} onChange={setRangeId}
+                       options={RANGES.map((r) => ({ id: r.id, label: r.label }))} />
           </Field>
 
           <Field label="Out-of-sample hold-out" hint="Fit nothing to the tail, then look once">
-            <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
-              {[null, 0.2, 0.3, 0.4].map((f) => (
-                <button
-                  key={String(f)}
-                  type="button"
-                  onClick={() => setOosFrac(f)}
-                  className={clsx(
-                    'min-h-9 flex-1 text-caption font-semibold transition-colors',
-                    oosFrac === f ? 'bg-fg text-ink-0'
-                      : 'text-fg-3 hover:text-fg-2',
-                  )}
-                >
-                  {f === null ? 'off' : `${f * 100}%`}
-                </button>
-              ))}
-            </div>
+            <Segmented label="Out-of-sample hold-out" options={HOLD_OUT}
+                       value={oosFrac === null ? 'off' : String(oosFrac)}
+                       onChange={(id) => setOosFrac(id === 'off' ? null : Number(id))} />
           </Field>
         </div>
 
         {rangeId === 'custom' && (
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:max-w-md">
-            <Field label="From">
-              <input type="date" value={start} max={end}
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">
+            <UiField id="bt-from" label="From">
+              <input id="bt-from" type="date" value={start} max={end}
                      onChange={(e) => setStart(e.target.value)} className={inputClass} />
-            </Field>
-            <Field label="To">
-              <input type="date" value={end} min={start} max={iso(new Date())}
+            </UiField>
+            <UiField id="bt-to" label="To">
+              <input id="bt-to" type="date" value={end} min={start} max={iso(new Date())}
                      onChange={(e) => setEnd(e.target.value)} className={inputClass} />
-            </Field>
+            </UiField>
           </div>
         )}
 
         {/* ---- Execution model ---- */}
-        <div className="mt-3">
-          <button
-            type="button"
-            onClick={() => setShowCosts((v) => !v)}
-            className="flex items-center gap-1.5 text-caption text-fg-3 transition-colors hover:text-fg-2"
-          >
-            <Settings2 size={12} />
+        <div className="mt-4 border-t border-line pt-2">
+          <Disclosure id="bt-costs" open={showCosts} onToggle={() => setShowCosts((v) => !v)}>
             Costs, sizing and stops
-            <ChevronDown size={12} className={clsx('transition-transform', showCosts && 'rotate-180')} />
-          </button>
+          </Disclosure>
           {showCosts && (
-            <div className="mt-2 grid grid-cols-2 gap-3 rounded-xl well p-3 sm:grid-cols-4">
+            <div id="bt-costs" className="mt-2 grid grid-cols-1 gap-4 rounded-xl well p-4 sm:grid-cols-2 lg:grid-cols-4">
               <NumberField label="Capital" value={capital} step={1000}
                            onChange={(v) => setCapital(v ?? 100_000)} placeholder="100000" />
               <NumberField
@@ -361,38 +326,35 @@ export default function BacktestSection({ symbol, currency }: {
               <NumberField label="Trailing stop %" value={trailPct} step="any" onChange={setTrailPct} />
               <NumberField label="ATR stop (×)" value={atrStop} step="any" onChange={setAtrStop}
                            hint="overrides stop loss %" />
-              <label className="col-span-2 flex items-center gap-2 pt-1 sm:col-span-4">
-                <input type="checkbox" checked={allowShort} className="h-3.5 w-3.5 accent-fg-2"
-                       onChange={(e) => setAllowShort(e.target.checked)} />
-                <span className="text-caption text-fg-2">Allow short entries</span>
-                <span className="ml-4 flex items-center gap-2">
-                  <input type="checkbox" checked={monteCarlo} className="h-3.5 w-3.5 accent-fg-2"
+              <div className="flex flex-wrap gap-x-6 sm:col-span-2 lg:col-span-4">
+                <label className="inline-flex min-h-11 items-center gap-2 text-body-sm text-fg-2">
+                  <input type="checkbox" checked={allowShort} className="h-4 w-4 accent-fg-2"
+                         onChange={(e) => setAllowShort(e.target.checked)} />
+                  Allow short entries
+                </label>
+                <label className="inline-flex min-h-11 items-center gap-2 text-body-sm text-fg-2">
+                  <input type="checkbox" checked={monteCarlo} className="h-4 w-4 accent-fg-2"
                          onChange={(e) => setMonteCarlo(e.target.checked)} />
-                  <span className="text-caption text-fg-2">Monte Carlo resample</span>
-                </span>
-              </label>
+                  Monte Carlo resample
+                </label>
+              </div>
             </div>
           )}
         </div>
 
         {/* ---- Strategy parameters ---- */}
         {strategy && strategy.params.length > 0 && (
-          <div className="mt-3">
-            <button
-              type="button"
-              onClick={() => setShowParams((v) => !v)}
-              className="flex items-center gap-1.5 text-caption text-fg-3 transition-colors hover:text-fg-2"
-            >
-              <Settings2 size={12} />
+          <div>
+            <Disclosure id="bt-params" open={showParams} onToggle={() => setShowParams((v) => !v)}>
               {strategy.name} parameters ({strategy.params.length})
-              <ChevronDown size={12} className={clsx('transition-transform', showParams && 'rotate-180')} />
-            </button>
+            </Disclosure>
             {showParams && (
-              <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl well p-3 sm:grid-cols-4 xl:grid-cols-6">
+              <div id="bt-params" className="mt-2 grid grid-cols-2 gap-4 rounded-xl well p-4 sm:grid-cols-3 lg:grid-cols-4">
                 {strategy.params.map((p) => (
-                  <div key={p.name}>
-                    <MicroLabel className="mb-0.5 truncate" >{p.name}</MicroLabel>
+                  <div key={p.name} className="flex min-w-0 flex-col gap-1.5">
+                    <label htmlFor={`bt-param-${p.name}`} className="truncate text-table text-fg-2">{p.name}</label>
                     <input
+                      id={`bt-param-${p.name}`}
                       type={p.type === 'string' ? 'text' : 'number'}
                       step={p.type === 'int' ? 1 : 'any'}
                       value={params[p.name] ?? ''}
@@ -403,11 +365,11 @@ export default function BacktestSection({ symbol, currency }: {
                         else next[p.name] = p.type === 'string' ? e.target.value : Number(e.target.value);
                         return next;
                       })}
-                      className="min-h-8 w-full rounded border border-white/15 bg-black/30 px-1.5 text-caption tabular text-fg focus:border-fg-2/50"
+                      className={inputClass}
                     />
                   </div>
                 ))}
-                <p className="col-span-2 text-caption text-fg-3 sm:col-span-4 xl:col-span-6">
+                <p className="col-span-2 text-caption text-fg-3 sm:col-span-3 lg:col-span-4">
                   Blank uses the default shown. Booleans take 1 or 0.
                 </p>
               </div>
@@ -416,47 +378,32 @@ export default function BacktestSection({ symbol, currency }: {
         )}
 
         {error && (
-          <p className="mt-3 rounded-lg border border-down/25 bg-down/[0.06] p-2.5 text-[12px] text-down">
+          <p role="alert" className="mt-4 rounded-lg border border-down/25 bg-down/[0.06] p-3 text-body-sm text-down">
             {error}
           </p>
         )}
 
         {running && (
-          <p className="mt-3 flex items-center gap-2 text-[12px] text-fg-2">
-            <RotateCw size={13} className="" />
-            Pulling history and simulating every bar…
+          <p role="status" className="mt-4 flex items-center gap-2 text-body-sm text-fg-2">
+            <Spinner size={18} />
+            Pulling history and simulating every bar. Decades of daily bars take a few seconds.
           </p>
         )}
 
         {result && !running && (
-          <p className="mt-3 border-t border-line pt-3 text-caption text-fg-3">
-            {result.bars.toLocaleString()} bars · {result.summary.n_trades} trades ·{' '}
+          <p className="mt-4 border-t border-line pt-3 text-caption text-fg-3">
+            {formatNumber(result.bars, 0)} bars · {result.summary.n_trades} trades ·{' '}
             {result.config.commission_bps as number} + {result.config.slippage_bps as number} bps
-            per side · simulated in {result.elapsed_ms.toLocaleString()} ms
+            per side · simulated in {formatNumber(result.elapsed_ms / 1000, 1)} s
           </p>
         )}
       </div>
 
-      {/* ---- Tabs ---- */}
+      {/* ---- Views ---- */}
       {(result || strategy) && (
         <>
-          <div className="flex flex-wrap gap-1.5">
-            {TABS.filter((t) => t.enabled).map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={clsx(
-                  'flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-caption font-semibold transition-colors',
-                  tab === t.id
-                    ? 'border-fg-2/30 bg-fg-2/10 text-fg-2'
-                    : 'border-line text-fg-3 hover:text-fg-2',
-                )}
-              >
-                {t.icon} {t.label}
-              </button>
-            ))}
-          </div>
+          <Segmented label="Backtest view" value={tab} onChange={setTab}
+                     options={TABS.filter((t) => t.enabled).map((t) => ({ id: t.id, label: t.label }))} />
 
           {tab === 'report' && result && (
             <BacktestResults result={result} currency={currency} />

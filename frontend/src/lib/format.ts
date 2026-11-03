@@ -73,6 +73,33 @@ export function direction(value: number | string | null | undefined, digits = 2)
   return n > 0 ? 'up' : 'down';
 }
 
+/** "3 Nov, 14:05", with the year when it isn't this one. `timeZone` is for tests. */
+export function formatDateTime(iso: string, now = new Date(), timeZone?: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const year = (t: Date) => new Intl.DateTimeFormat('en-US', { year: 'numeric', timeZone }).format(t);
+  const sameYear = year(d) === year(now);
+  return new Intl.DateTimeFormat('en-IN', {
+    day: 'numeric', month: 'short', ...(sameYear ? {} : { year: 'numeric' }),
+    hour: '2-digit', minute: '2-digit', hour12: false, timeZone,
+  }).format(d);
+}
+
+export type Recency = 'Today' | 'Yesterday' | 'Previous 7 days' | 'Older';
+
+/** Which sidebar group a chat falls in, by calendar day in local time. */
+export function recencyGroup(iso: string, now = new Date()): Recency {
+  const day = (t: Date) => new Date(t.getFullYear(), t.getMonth(), t.getDate()).getTime();
+  const days = Math.round((day(now) - day(new Date(iso))) / 86_400_000);
+  return days <= 0 ? 'Today' : days === 1 ? 'Yesterday' : days < 7 ? 'Previous 7 days' : 'Older';
+}
+
+/** Elapsed time: "8s" under a minute, then "1m 05s". */
+export function formatDuration(ms: number): string {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s`;
+}
+
 export function timeAgo(iso: string | number | Date): string {
   const t = new Date(iso).getTime();
   if (!Number.isFinite(t)) return '';

@@ -112,13 +112,13 @@ export default function FundamentalsPanel({ data, currency }: { data: Fundamenta
               <span>Revenue CAGR ({trends.window_years}y): <span className={clsx('tabular font-medium', trends.revenue_cagr_pct >= 10 ? 'text-up' : 'text-fg')}>{trends.revenue_cagr_pct}%</span></span>
             )}
             {trends.profit_cagr_pct !== null && (
-              <span>Profit CAGR: <span className={clsx('tabular font-medium', trends.profit_cagr_pct >= 10 ? 'text-up' : 'text-fg')}>{trends.profit_cagr_pct}%</span></span>
+              <span>Yearly profit growth <span className={clsx('tabular font-medium', trends.profit_cagr_pct >= 10 ? 'text-up' : 'text-fg')}>{trends.profit_cagr_pct}%</span></span>
             )}
             {qm?.revenue_yoy !== undefined && (
-              <span>Last qtr rev YoY: <span className={clsx('tabular font-medium', qm.revenue_yoy >= 0 ? 'text-up' : 'text-down')}>{qm.revenue_yoy}%</span></span>
+              <span>Revenue growth last quarter <span className={clsx('tabular font-medium', qm.revenue_yoy >= 0 ? 'text-up' : 'text-down')}>{qm.revenue_yoy}%</span></span>
             )}
             {qm?.net_income_yoy !== undefined && (
-              <span>Last qtr profit YoY: <span className={clsx('tabular font-medium', qm.net_income_yoy >= 0 ? 'text-up' : 'text-down')}>{qm.net_income_yoy}%</span></span>
+              <span>Profit growth last quarter <span className={clsx('tabular font-medium', qm.net_income_yoy >= 0 ? 'text-up' : 'text-down')}>{qm.net_income_yoy}%</span></span>
             )}
           </div>
         </div>
@@ -197,8 +197,8 @@ export default function FundamentalsPanel({ data, currency }: { data: Fundamenta
       </div>
 
       <p className="mt-4 border-t border-line pt-2 text-caption leading-relaxed text-fg-3">
-        Not covered by this automated x-ray (needs manual reading): {data.not_covered?.join(' · ')}.
-        All figures derived from public filings data; paper-trading research, not investment advice.
+        This automated check does not cover {data.not_covered?.join(', ')}, so read those yourself.
+        All figures come from public filings. This is paper-trading research, not investment advice.
       </p>
     </div>
   );

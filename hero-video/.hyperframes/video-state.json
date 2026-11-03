@@ -1,0 +1,361 @@
+{
+  "version": 1,
+  "historyId": "8528a414-be7e-432a-98e6-7bbe1f623074",
+  "currentRevision": "63858a24-b08b-4cfa-91a3-32fb1eb3917f",
+  "pendingChanges": false,
+  "files": {
+    "AGENTS.md": {
+      "hash": "1b36171117cb7c18f4100a0db6a3782ff2e096115995733200445cc2e80a4060",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\1b\\1b36171117cb7c18f4100a0db6a3782ff2e096115995733200445cc2e80a4060"
+    },
+    "CLAUDE.md": {
+      "hash": "1b36171117cb7c18f4100a0db6a3782ff2e096115995733200445cc2e80a4060",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\1b\\1b36171117cb7c18f4100a0db6a3782ff2e096115995733200445cc2e80a4060"
+    },
+    "hyperframes.json": {
+      "hash": "35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\35\\35a6d4ea79ebe911f0d81705f7aace5d8ff0316b745b0311d56af50c9c237cb7"
+    },
+    "index.html": {
+      "hash": "1e52dc63efb3f695380da5ff75eb01a0a70b30ff0a4d74d8aefb21d1e39042d0",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\1e\\1e52dc63efb3f695380da5ff75eb01a0a70b30ff0a4d74d8aefb21d1e39042d0"
+    },
+    "meta.json": {
+      "hash": "b6d116424fd2ad2b537c56eb7dbd60a91395419bb04f1927ab7ede76516962df",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\b6\\b6d116424fd2ad2b537c56eb7dbd60a91395419bb04f1927ab7ede76516962df"
+    },
+    "package.json": {
+      "hash": "8c08e2a496c380a95d5cd0c9d1ba8231a26e43ca5538d95c9986d1cbbdb61b97",
+      "content": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\8c\\8c08e2a496c380a95d5cd0c9d1ba8231a26e43ca5538d95c9986d1cbbdb61b97"
+    }
+  },
+  "revisions": {
+    "667016ad-6e8d-44a4-af08-d7d4483bee63": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792804162440,
+      "endedAt": 1792804162453,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\f1\\f1f84f0093c5153174ca2c555f1886923628031cae19ea2a583407ab3cbe50c2",
+          "after": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\13\\13943606de62e98e8d21718d399aa34d61e080c2b56086ad0a82e7ef768f3479"
+        }
+      }
+    },
+    "144e3d45-48c1-4257-9817-c1903053a518": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792804247330,
+      "endedAt": 1792804247332,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\13\\13943606de62e98e8d21718d399aa34d61e080c2b56086ad0a82e7ef768f3479",
+          "after": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\74\\746809a3dc2e38adcb4655a3406ac91eb21ff3fa00557302757d00cc02376a96"
+        }
+      }
+    },
+    "1d5c0014-9fa0-489a-8f0b-a6812dbd6387": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792804334779,
+      "endedAt": 1792804334780,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\74\\746809a3dc2e38adcb4655a3406ac91eb21ff3fa00557302757d00cc02376a96",
+          "after": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\79\\793a5920ebab2a52b8562f846218a6c6bbbf39a848a59a357dedf968ce87e2d6"
+        }
+      }
+    },
+    "a01efbb9-609d-4f27-a2d1-f2c2b5728606": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792804409865,
+      "endedAt": 1792804409868,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\79\\793a5920ebab2a52b8562f846218a6c6bbbf39a848a59a357dedf968ce87e2d6",
+          "after": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\9c\\9cc678068f13bcaaf6201a29fca4b66a13189d762ad29362e534d0d4b84b404c"
+        }
+      }
+    },
+    "63858a24-b08b-4cfa-91a3-32fb1eb3917f": {
+      "actor": {
+        "kind": "outside",
+        "name": "Outside"
+      },
+      "label": "Changed outside the app",
+      "startedAt": 1792804779550,
+      "endedAt": 1792804779553,
+      "files": {
+        "index.html": {
+          "before": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\9c\\9cc678068f13bcaaf6201a29fca4b66a13189d762ad29362e534d0d4b84b404c",
+          "after": "C:\\Users\\asus\\.cache\\hyperframes\\history\\8528a414-be7e-432a-98e6-7bbe1f623074\\blobs\\1e\\1e52dc63efb3f695380da5ff75eb01a0a70b30ff0a4d74d8aefb21d1e39042d0"
+        }
+      }
+    }
+  },
+  "checks": {
+    "latest": {
+      "revision": "a01efbb9-609d-4f27-a2d1-f2c2b5728606",
+      "id": "c6c7761b-125d-41c2-8709-dd49a973995b"
+    },
+    "revisions": {
+      "1d5c0014-9fa0-489a-8f0b-a6812dbd6387": [
+        {
+          "id": "01cc5311-6eb7-47c3-be2e-b455c03d4b87",
+          "scope": "project",
+          "report": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\hero-video\\.hyperframes\\artifacts\\checks\\01cc5311-6eb7-47c3-be2e-b455c03d4b87.json",
+          "metadata": {
+            "ok": false,
+            "browserSkipped": true,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1792804389886,
+          "contentHash": "e9fcaccdda100d294c56936c7df3a0d946ffc85338b77f51e0a393a44bf57c85",
+          "revision": "1d5c0014-9fa0-489a-8f0b-a6812dbd6387",
+          "inputFingerprint": "3985a6e91432ba3dd1d721f714d4af71b7c8dbe8b2ee6df5f77d35ebd5043a83",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ],
+      "a01efbb9-609d-4f27-a2d1-f2c2b5728606": [
+        {
+          "id": "c6c7761b-125d-41c2-8709-dd49a973995b",
+          "scope": "project",
+          "report": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\hero-video\\.hyperframes\\artifacts\\checks\\c6c7761b-125d-41c2-8709-dd49a973995b.json",
+          "metadata": {
+            "ok": true,
+            "browserSkipped": false,
+            "options": {
+              "samples": 9,
+              "atTransitions": false,
+              "maxIssues": 80,
+              "collapseStatic": true,
+              "tolerance": 2,
+              "timeout": 3000,
+              "contrast": true,
+              "strict": false,
+              "snapshots": false,
+              "browserGpuMode": "auto"
+            }
+          },
+          "createdAt": 1792804416661,
+          "contentHash": "3d3c4e46310b9d6cd74d2fbca730b57d20a92117b5620f6399b6a2952b950409",
+          "revision": "a01efbb9-609d-4f27-a2d1-f2c2b5728606",
+          "inputFingerprint": "52d0812ece53ef962ed1695d30d4089af4c4275d2c99e09a96115a2bb8b079f0",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": {
+      "revision": "1d5c0014-9fa0-489a-8f0b-a6812dbd6387",
+      "id": "52431c71-85ad-4d96-bd09-0683baf17f14-3"
+    },
+    "revisions": {
+      "667016ad-6e8d-44a4-af08-d7d4483bee63": [],
+      "144e3d45-48c1-4257-9817-c1903053a518": [],
+      "1d5c0014-9fa0-489a-8f0b-a6812dbd6387": [
+        {
+          "scope": "full",
+          "id": "52431c71-85ad-4d96-bd09-0683baf17f14-0",
+          "image": "C:\\Users\\asus\\AppData\\Local\\Temp\\claude\\c--Users-asus-Desktop-algo-trader-frontend\\21e58f9a-c157-41e3-9a6c-5583fb746f23\\scratchpad\\snap\\frame-00-at-0s.png",
+          "time": 0,
+          "metadata": {
+            "width": 3840,
+            "height": 2160,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792804340976,
+          "contentHash": "a90d59362f074a59641da5555966dcce7aaae0b9c32c28a47e7212432ca5ea1c",
+          "revision": "1d5c0014-9fa0-489a-8f0b-a6812dbd6387",
+          "inputFingerprint": "3985a6e91432ba3dd1d721f714d4af71b7c8dbe8b2ee6df5f77d35ebd5043a83",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "52431c71-85ad-4d96-bd09-0683baf17f14-1",
+          "image": "C:\\Users\\asus\\AppData\\Local\\Temp\\claude\\c--Users-asus-Desktop-algo-trader-frontend\\21e58f9a-c157-41e3-9a6c-5583fb746f23\\scratchpad\\snap\\frame-01-at-5s.png",
+          "time": 5,
+          "metadata": {
+            "width": 3840,
+            "height": 2160,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792804340979,
+          "contentHash": "d85964d08ca24251d9faacc34684677bf53a3d2ec7c039d9dd4c60498c8ac5b2",
+          "revision": "1d5c0014-9fa0-489a-8f0b-a6812dbd6387",
+          "inputFingerprint": "3985a6e91432ba3dd1d721f714d4af71b7c8dbe8b2ee6df5f77d35ebd5043a83",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "52431c71-85ad-4d96-bd09-0683baf17f14-2",
+          "image": "C:\\Users\\asus\\AppData\\Local\\Temp\\claude\\c--Users-asus-Desktop-algo-trader-frontend\\21e58f9a-c157-41e3-9a6c-5583fb746f23\\scratchpad\\snap\\frame-02-at-10s.png",
+          "time": 10,
+          "metadata": {
+            "width": 3840,
+            "height": 2160,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792804340980,
+          "contentHash": "b7a0d78f6b935616fa6cba5e0f092563f2e44a549ff185b9f834e3bcc58913b3",
+          "revision": "1d5c0014-9fa0-489a-8f0b-a6812dbd6387",
+          "inputFingerprint": "3985a6e91432ba3dd1d721f714d4af71b7c8dbe8b2ee6df5f77d35ebd5043a83",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        },
+        {
+          "scope": "full",
+          "id": "52431c71-85ad-4d96-bd09-0683baf17f14-3",
+          "image": "C:\\Users\\asus\\AppData\\Local\\Temp\\claude\\c--Users-asus-Desktop-algo-trader-frontend\\21e58f9a-c157-41e3-9a6c-5583fb746f23\\scratchpad\\snap\\frame-03-at-15s.png",
+          "time": 15,
+          "metadata": {
+            "width": 3840,
+            "height": 2160,
+            "zoomScale": 1,
+            "browserGpuMode": "auto",
+            "warnings": [],
+            "partial": false
+          },
+          "createdAt": 1792804340981,
+          "contentHash": "e58b495203e83c0daac769904a53a5f8080c761b223d75b6515bc2716f1143b5",
+          "revision": "1d5c0014-9fa0-489a-8f0b-a6812dbd6387",
+          "inputFingerprint": "3985a6e91432ba3dd1d721f714d4af71b7c8dbe8b2ee6df5f77d35ebd5043a83",
+          "inputScope": "local-project-files",
+          "attribution": "recorded-revision"
+        }
+      ]
+    },
+    "unversioned": [
+      {
+        "scope": "full",
+        "id": "3a063172-ba70-4abc-8c17-a5f17d360784-0",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\hero-video\\.hyperframes\\artifacts\\snapshots\\15832730-f627-4ecd-9951-9b40018009b5\\frame-00-at-0s.png",
+        "time": 0,
+        "metadata": {
+          "width": 3840,
+          "height": 2160,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792803991781,
+        "contentHash": "a6132d7b240fe3d95b38253099a42232d1658e824be13a27e4f2fc216d22d109",
+        "revision": null,
+        "inputFingerprint": "322f98bb622ccb135eac1f56bde4a4b96e1428395254ed27925ec5be42872adb",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "3a063172-ba70-4abc-8c17-a5f17d360784-1",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\hero-video\\.hyperframes\\artifacts\\snapshots\\15832730-f627-4ecd-9951-9b40018009b5\\frame-01-at-5s.png",
+        "time": 5,
+        "metadata": {
+          "width": 3840,
+          "height": 2160,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792803991781,
+        "contentHash": "95386b187e69e8953abba1f63153d9fb293f9666e0d1772786c0ca8f5eaaf5f7",
+        "revision": null,
+        "inputFingerprint": "322f98bb622ccb135eac1f56bde4a4b96e1428395254ed27925ec5be42872adb",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "3a063172-ba70-4abc-8c17-a5f17d360784-2",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\hero-video\\.hyperframes\\artifacts\\snapshots\\15832730-f627-4ecd-9951-9b40018009b5\\frame-02-at-10s.png",
+        "time": 10,
+        "metadata": {
+          "width": 3840,
+          "height": 2160,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792803991781,
+        "contentHash": "b096c86dff6c5e21697d238f236735c06d23449d7e5cb89bfe187f34506f8370",
+        "revision": null,
+        "inputFingerprint": "322f98bb622ccb135eac1f56bde4a4b96e1428395254ed27925ec5be42872adb",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      },
+      {
+        "scope": "full",
+        "id": "3a063172-ba70-4abc-8c17-a5f17d360784-3",
+        "image": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\hero-video\\.hyperframes\\artifacts\\snapshots\\15832730-f627-4ecd-9951-9b40018009b5\\frame-03-at-15s.png",
+        "time": 15,
+        "metadata": {
+          "width": 3840,
+          "height": 2160,
+          "zoomScale": 1,
+          "browserGpuMode": "auto",
+          "warnings": [],
+          "partial": false
+        },
+        "createdAt": 1792803991781,
+        "contentHash": "04c000019095821f3db178a574ff3f02a318823f188e48b078c1195e3e168548",
+        "revision": null,
+        "inputFingerprint": "322f98bb622ccb135eac1f56bde4a4b96e1428395254ed27925ec5be42872adb",
+        "inputScope": "local-project-files",
+        "attribution": "unversioned"
+      }
+    ]
+  },
+  "renders": {
+    "latest": {
+      "id": "ce81d554-2936-4024-89de-31b0378009d4",
+      "completedAt": 1792804548305,
+      "output": "C:\\Users\\asus\\Desktop\\algo-trader-frontend\\hero-video\\renders\\silk-4k-master.mp4",
+      "status": "completed",
+      "revision": null
+    },
+    "retainedRevisions": []
+  },
+  "pendingArtifactCleanup": []
+}

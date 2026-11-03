@@ -1,62 +1,37 @@
 import Link from 'next/link';
-import clsx from 'clsx';
+import { Change } from '@/components/ui/Change';
+import { formatMoney } from '@/lib/format';
 import type { DiscoverCard } from '../../types/discover';
-import { fmtPrice } from '../intel/format';
-import { TAG_STYLES } from './tagStyles';
 import Sparkline from './Sparkline';
-import PctChip from './PctChip';
+import { TAG_LABELS } from './tagStyles';
 
 /**
- * One horizon-tagged idea card. Purely descriptive — the tag reasons are the
- * evidence, the click-through lands on the Terminal for the full readout.
+ * One horizon-tagged idea card. Purely descriptive: each tag carries the
+ * numbers that set it, and the card opens the symbol page for the full read.
  */
 export default function IdeaCard({ card }: { card: DiscoverCard }) {
   return (
-    <Link
-      href={`/s/${encodeURIComponent(card.symbol)}`}
-      className="glass rounded-xl block p-4 transition-colors hover:bg-white/[0.06] focus-visible:ring-1 focus-visible:ring-fg-2/50"
-    >
+    <Link href={`/s/${encodeURIComponent(card.symbol)}`}
+          className="glass flex h-full flex-col gap-3 rounded-2xl p-4 hover:ring-1 hover:ring-white/25">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <div className="font-semibold text-fg">{card.symbol}</div>
-          <div className="truncate text-xs text-fg-3">{card.name}</div>
+          <p className="ticker truncate">{card.symbol}</p>
+          <p className="truncate text-caption text-fg-3">{card.name}</p>
         </div>
-        <div className="shrink-0 text-right">
-          <div className="text-sm font-semibold tabular text-fg">
-            {fmtPrice(card.price, card.currency)}
-          </div>
-          <div className="mt-0.5">
-            <PctChip value={card.change_1d_pct} />
-          </div>
+        <div className="flex shrink-0 flex-col items-end">
+          <span className="text-body-sm tabular">{formatMoney(card.price, card.currency)}</span>
+          <Change pct={card.change_1d_pct} className="text-table" />
         </div>
       </div>
-
-      <div className="mt-2">
-        <Sparkline data={card.spark} />
-      </div>
-
-      <div className="mt-2 flex flex-wrap gap-1.5">
+      <Sparkline data={card.spark} />
+      <ul className="flex flex-col gap-2">
         {card.tags.map((tag) => (
-          <span
-            key={tag.id}
-            className={clsx(
-              'rounded border px-1.5 py-0.5 text-caption',
-              TAG_STYLES[tag.id].chip,
-            )}
-          >
-            {tag.label}
-          </span>
+          <li key={tag.id} className="flex flex-col items-start gap-1">
+            <span className="rounded border border-white/15 px-1.5 text-caption text-fg">{TAG_LABELS[tag.id]}</span>
+            <span className="text-caption text-fg-3">{tag.reason}</span>
+          </li>
         ))}
-      </div>
-
-      <div className="mt-2 space-y-1">
-        {card.tags.map((tag) => (
-          <div key={tag.id} className="flex items-start gap-1.5">
-            <span className={clsx('mt-1 h-1.5 w-1.5 shrink-0 rounded-full', TAG_STYLES[tag.id].dot)} />
-            <span className="text-caption leading-snug text-fg-3">{tag.reason}</span>
-          </div>
-        ))}
-      </div>
+      </ul>
     </Link>
   );
 }

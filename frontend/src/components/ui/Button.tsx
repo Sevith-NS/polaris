@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import { Loader2 } from './icons';
+import { Spinner } from './Spinner';
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'paper';
 type Size = 'md' | 'sm' | 'lg';
@@ -46,7 +46,7 @@ export function Button({ variant = 'primary', size = 'md', loading, disabled, cl
       aria-busy={loading || undefined}
       {...rest}
     >
-      {loading && <Loader2 size={14} className="animate-spin" />}
+      {loading && <Spinner size={16} />}
       {children}
     </button>
   );

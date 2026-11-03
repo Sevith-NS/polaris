@@ -2,19 +2,27 @@ import clsx from 'clsx';
 import type { CSSProperties, ReactNode } from 'react';
 import { errorMessage } from '@/lib/api';
 import { Button } from './Button';
+import { Spinner } from './Spinner';
 
+/** A placeholder the size of what is loading, with the Polaris spinner in it. */
 export function Skeleton({ className, style }: { className?: string; style?: CSSProperties }) {
-  return <span aria-hidden="true" style={style} className={clsx('skeleton block h-3', className)} />;
+  return (
+    <span aria-hidden="true" style={style} className={clsx('flex h-5 items-center justify-center', className)}>
+      <Spinner size={20} />
+    </span>
+  );
 }
 
-/** A few skeleton lines inside a status region, so screen readers hear "Loading". */
+/** The Polaris spinner and what is loading, in a status region screen readers announce. */
 export function LoadingBlock({ lines = 4, label = 'Loading', className }: {
   lines?: number; label?: string; className?: string;
 }) {
-  const widths = ['w-3/4', 'w-1/2', 'w-full', 'w-5/6', 'w-2/3', 'w-11/12'];
   return (
-    <div role="status" aria-label={label} className={clsx('flex flex-col gap-3 py-2', className)}>
-      {Array.from({ length: lines }, (_, i) => <Skeleton key={i} className={widths[i % widths.length]} />)}
+    // 24px per line keeps the height the skeleton lines had, so content doesn't jump in.
+    <div role="status" style={{ minHeight: lines * 24 }}
+         className={clsx('flex flex-col items-center justify-center gap-3 py-2 text-caption text-fg-3', className)}>
+      <Spinner size={28} />
+      {label}
     </div>
   );
 }
