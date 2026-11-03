@@ -1,26 +1,13 @@
 "use client";
-import { useState } from 'react';
-import {
-  Microscope, Sparkles, Hourglass, Quote,
-  Building2, Receipt, Scale, Swords, Users,
-  CandlestickChart, CalendarClock, TrendingUp, TrendingDown, Calculator, WifiOff,
-} from '@/components/ui/icons';
+import { Microscope, Hourglass, WifiOff } from '@/components/ui/icons';
 import clsx from 'clsx';
-import { apiGet, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../lib/api';
 import { useApi } from '../../lib/useApi';
-import type { DeepAnalysis, Narrative } from '../../types/intel';
+import type { DeepAnalysis } from '../../types/intel';
 import FundamentalsPanel from './FundamentalsPanel';
+import { AiDeepDive } from './AiDeepDive';
 import { fmtPrice, phaseColor, PHASE_LABELS } from './format';
 import { tint } from '../../lib/theme';
-
-// The model is instructed to return strings, but a partial or mis-shaped JSON
-// response must never take down the page — coerce arrays to prose, drop the rest.
-const asText = (v: unknown): string | null =>
-  typeof v === 'string' && v.trim()
-    ? v
-    : Array.isArray(v)
-      ? v.filter((x) => typeof x === 'string').join(' ') || null
-      : null;
 
 function PillarBar({ label, value }: { label: string; value: number | null }) {
   if (value === null) {
@@ -60,39 +47,11 @@ const PILLAR_NOTES: Record<string, string> = {
 
 /**
  * The deep dive: five readings side by side (no blended call, no conviction,
- * no "buy below" price), technical phase, and an AI write-up that explains
- * the data without recommending anything. The newest saved write-up shows on
- * open; a new one is written at most once a day per symbol. Figures come from
- * the computed numbers; qualitative context from the model's knowledge.
+ * no "buy below" price), technical phase, the fundamentals X-ray, and an AI
+ * write-up (AiDeepDive) that explains the data without recommending anything.
  */
 export default function DeepAnalysisSection({ symbol, currency }: { symbol: string; currency: string }) {
   const { data, error, loading } = useApi<DeepAnalysis>(`/api/deep-analysis?symbol=${encodeURIComponent(symbol)}`);
-  // The AI teardown belongs to the symbol it was written for; switching
-  // tickers drops it rather than showing one company's story under another.
-  const [ai, setAi] = useState<{ symbol: string; narrative?: Narrative; at?: string; error?: string } | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const mine = ai?.symbol === symbol ? ai : null;
-  const narrative = mine?.narrative ?? data?.narrative ?? null;
-  const writtenAt = (mine?.narrative ? mine.at : data?.narrative_at) ?? null;
-  const aiError = mine?.error ?? '';
-  // The backend counts teardown days in IST, so compare in IST too.
-  const writtenToday = writtenAt === new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
-
-  const runAiTeardown = async () => {
-    const forSymbol = symbol;
-    setAiLoading(true);
-    setAi(null);
-    try {
-      const d = await apiGet<DeepAnalysis>(`/api/deep-analysis?symbol=${encodeURIComponent(forSymbol)}&ai=1`);
-      setAi(d.narrative
-        ? { symbol: forSymbol, narrative: d.narrative, at: d.narrative_at ?? undefined }
-        : { symbol: forSymbol, error: "The deep dive can't be written right now. The numbers above still stand." });
-    } catch (err) {
-      setAi({ symbol: forSymbol, error: errorMessage(err) });
-    } finally {
-      setAiLoading(false);
-    }
-  };
 
   if (loading && !data) {
     return (
@@ -187,128 +146,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
       {/* ---- Fundamentals X-Ray ---- */}
       <FundamentalsPanel data={fundamentals} currency={currency} />
 
-      {/* ---- AI research note ---- */}
-      <div className="glass rounded-xl p-5">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-fg">
-            <Sparkles size={15} className="text-fg-2" /> AI Deep Dive
-            <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
-              figures from computed data · context from model knowledge
-            </span>
-          </h3>
-          {(!narrative || !writtenToday) && (
-            <button
-              onClick={runAiTeardown}
-              disabled={aiLoading}
-              className="rounded-lg border border-fg-2/30 bg-fg-2/5 px-4 py-2 text-xs font-semibold text-fg-2 transition-colors hover:bg-fg-2/10 disabled:opacity-50"
-            >
-              {aiLoading ? 'Writing the deep dive…' : narrative ? "Rewrite with today's data" : 'Write the deep dive'}
-            </button>
-          )}
-        </div>
-
-        {aiError && <p className="text-xs text-down">{aiError}</p>}
-
-        {narrative && writtenAt && (
-          <p className="mb-3 text-caption text-fg-3">
-            Written {new Date(`${writtenAt}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}.
-          </p>
-        )}
-
-        {!narrative && !aiError && !aiLoading && (
-          <p className="text-xs text-fg-2">
-            A plain-English teardown of {symbol}. It covers the business, the latest quarter, the balance
-            sheet, risks and valuation. It explains and never tells you what to do.
-          </p>
-        )}
-
-        {narrative && (() => {
-          // Coerce every section defensively — a missing key just skips its block.
-          const oneLiner = asText(narrative.one_liner);
-          const watch = asText(narrative.what_to_watch);
-          const sections = [
-            { icon: <Building2 size={13} />, title: 'Business model', text: asText(narrative.business_model) },
-            { icon: <Receipt size={13} />, title: 'Quarterly results', text: asText(narrative.quarterly_results) },
-            { icon: <Scale size={13} />, title: 'Balance sheet', text: asText(narrative.balance_sheet) },
-            { icon: <Swords size={13} />, title: 'Competitive position', text: asText(narrative.competitive_position) },
-            { icon: <Users size={13} />, title: 'Management quality', text: asText(narrative.management_quality) },
-            { icon: <CandlestickChart size={13} />, title: 'Technical setup', text: asText(narrative.technical_setup) },
-            { icon: <CalendarClock size={13} />, title: 'Catalysts', text: asText(narrative.catalysts) },
-          ].filter(s => s.text);
-          const bull = asText(narrative.bull_case);
-          const bear = asText(narrative.bear_case);
-          const valuation = asText(narrative.valuation);
-          return (
-            <div className="space-y-4">
-              {oneLiner && (
-                <div className="rounded-xl border border-fg-2/20 bg-fg-2/5 p-4">
-                  <Quote size={14} className="mb-1 text-fg-2" />
-                  <p className="text-sm font-medium leading-relaxed text-fg">{oneLiner}</p>
-                </div>
-              )}
-
-              {/* ---- Sections 1-7 in template order ---- */}
-              {sections.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {sections.map((s, i) => (
-                    <div key={i}>
-                      <h4 className="mb-1 flex items-center gap-1.5 text-caption font-semibold text-fg-3">
-                        {s.icon} {s.title}
-                      </h4>
-                      <p className="text-xs leading-relaxed text-fg-2">{s.text}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* ---- Bull vs bear, side by side ---- */}
-              {(bull || bear) && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {bull && (
-                    <div className="rounded-xl border border-up/25 bg-up/5 p-4">
-                      <h4 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-up">
-                        <TrendingUp size={12} /> Going well
-                      </h4>
-                      <p className="text-xs leading-relaxed text-fg-2">{bull}</p>
-                    </div>
-                  )}
-                  {bear && (
-                    <div className="rounded-xl border border-down/25 bg-down/5 p-4">
-                      <h4 className="mb-1.5 flex items-center gap-1.5 text-caption font-semibold text-down">
-                        <TrendingDown size={12} /> Could go wrong
-                      </h4>
-                      <p className="text-xs leading-relaxed text-fg-2">{bear}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {valuation && (
-                <div>
-                  <h4 className="mb-1 flex items-center gap-1.5 text-caption font-semibold text-fg-3">
-                    <Calculator size={13} /> Valuation
-                  </h4>
-                  <p className="text-xs leading-relaxed text-fg-2">{valuation}</p>
-                </div>
-              )}
-
-              {watch && (
-                <div>
-                  <h4 className="mb-1 flex items-center gap-1.5 text-caption font-semibold text-fg-3">
-                    <CalendarClock size={13} /> What to watch
-                  </h4>
-                  <p className="text-xs leading-relaxed text-fg-2">{watch}</p>
-                </div>
-              )}
-            </div>
-          );
-        })()}
-
-        <p className="mt-4 border-t border-line pt-2 text-caption leading-relaxed text-fg-3">
-          Figures come from the data above. Background on the business and its rivals comes from the
-          model&apos;s general knowledge, so check it before relying on it. Not investment advice.
-        </p>
-      </div>
+      <AiDeepDive symbol={symbol} data={data} />
     </div>
   );
 }
