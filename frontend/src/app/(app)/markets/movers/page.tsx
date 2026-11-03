@@ -7,11 +7,11 @@ import { Panel } from '@/components/PageHeader';
 import { BreadthBar } from '@/components/home/MarketBreadth';
 import { Method } from '@/components/markets/Method';
 import { MoverTable, type MoverItem } from '@/components/markets/MoverTable';
-import { AlertTriangle, Loader2 } from '@/components/ui/icons';
+import { Loader2 } from '@/components/ui/icons';
 import { Segmented } from '@/components/ui/Segmented';
 import { Select } from '@/components/ui/Select';
 import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
-import { formatNumber, formatPct } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
 import type { CircuitConfidence, MoverRow, MoversResponse, ScopeMeta } from '@/types/movers';
 
@@ -58,15 +58,6 @@ function Stack({ top, bottom, bottomClass = 'text-fg-3' }: { top: ReactNode; bot
   );
 }
 
-function Note({ warn = false, children }: { warn?: boolean; children: ReactNode }) {
-  return (
-    <p className={clsx('flex items-start gap-2 rounded-xl border px-4 py-3 text-body-sm text-fg-2',
-      warn ? 'border-warn/30 bg-warn/[0.06]' : 'border-white/15 bg-white/[0.04]')}>
-      {children}
-    </p>
-  );
-}
-
 function Movers() {
   const params = useSearchParams();
   const router = useRouter();
@@ -103,7 +94,16 @@ function Movers() {
 
   return (
     <div className="flex flex-col gap-5">
-      <Segmented label="Board" value={board} onChange={(v) => set('board', v)} options={BOARDS} />
+      <div className="flex items-start justify-between gap-3">
+        <Segmented label="Board" value={board} onChange={(v) => set('board', v)} options={BOARDS} />
+        {/* Owner, 2026-11-03: no warming or coverage notes, the scan just fills in behind this. */}
+        {data?.warming && (
+          <span role="status" className="grid min-h-11 min-w-11 shrink-0 place-items-center text-fg-3">
+            <Loader2 size={18} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+            <span className="sr-only">Still scanning the market. The board fills in as prices arrive.</span>
+          </span>
+        )}
+      </div>
 
       <div className="flex flex-wrap items-start gap-x-6 gap-y-4">
         <div className="flex w-full flex-col gap-1.5 sm:w-80">
@@ -118,35 +118,6 @@ function Movers() {
           </div>
         )}
       </div>
-
-      {data?.warming && (
-        <Note>
-          <Loader2 size={16} aria-hidden="true" className="mt-0.5 shrink-0 animate-spin motion-reduce:animate-none" />
-          <span>
-            {data.warm_progress?.phase === 'intraday' ? 'Measuring intraday ranges for the biggest movers' : 'Still pricing the market'}
-            {data.warm_progress && ` (${data.warm_progress.done} of ${data.warm_progress.total} batches)`}.
-            {' '}Showing {formatNumber(data.priced, 0, 'INR')} stocks so far, so this board is incomplete.
-          </span>
-        </Note>
-      )}
-      {data && data.excluded_implausible > 0 && (
-        <Note>
-          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-fg-3" />
-          <span>
-            Left out {data.excluded_implausible} {data.excluded_implausible === 1 ? 'stock that' : 'stocks that'} moved
-            more than {data.sanity_max_move_pct}%. The widest NSE band is 20%, so these are most likely splits or
-            bonuses the price data has not adjusted yet
-            {data.excluded_examples.length > 0 && `, for example ${data.excluded_examples
-              .map((e) => `${e.symbol} ${formatPct(e.change_pct, 1)}`).join(', ')}`}.
-          </span>
-        </Note>
-      )}
-      {data?.warnings.map((w) => (
-        <Note key={w} warn>
-          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-warn" />
-          <span>{w}.</span>
-        </Note>
-      ))}
 
       {loading && !data ? <LoadingBlock lines={8} label="Loading movers" className="glass rounded-2xl p-6" />
         : error && !data ? <ErrorState error={error} title="Couldn't load movers" onRetry={reload} />
@@ -165,7 +136,8 @@ function Movers() {
               <BreadthBar b={{
                 universe: data.scope_label, advancing: data.breadth.advancing, declining: data.breadth.declining,
                 unchanged: data.breadth.unchanged, priced: data.priced, scanned: data.scanned,
-                coverage_pct: data.coverage_pct, partial: data.partial,
+                // The spinner above stands in for the "covers N of M while prices load" line.
+                coverage_pct: data.coverage_pct, partial: false,
               }} />
             </section>
 
