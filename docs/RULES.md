@@ -45,7 +45,7 @@
 
 - **MUST** make components Server Components by default. Add `'use client'` only for state, effects, event handlers or browser APIs, and push it as far down the tree as possible.
 - **MUST** fetch on the server with `serverGet` when the data is needed for first paint, and on the client with `useApi`. Never `fetch` the backend URL directly. All client calls go through `lib/api.ts`.
-- **MUST** handle all five data states (loading, empty, error, partial/stale, success) for every data view, using `Skeleton`, `EmptyState`, `ErrorState` and `Banner`.
+- **MUST** handle all five data states (loading, empty, error, partial/stale, success) for every data view, using `LoadingBlock` (sections) or `Skeleton` (small parts), `EmptyState`, `ErrorState` and `Banner`.
 - **MUST** clean up effects: abort fetches, clear intervals, kill GSAP contexts (use `useGSAP`).
 - **MUST** put tab, filter, sort and selected-portfolio state in the URL (`useSearchParams` / `useRouter`), not in component state.
 - **MUST NOT** use `dangerouslySetInnerHTML`, inline `<script>`, or third-party script tags (the strict CSP blocks them anyway).

@@ -49,7 +49,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {/* dynamic: render per request so the CSP nonce from proxy.ts reaches
             Next's scripts and Clerk's. A prerendered page has no nonce and
             the policy would block its scripts. */}
-        <ClerkProvider appearance={clerkAppearance} dynamic>{children}</ClerkProvider>
+        <ClerkProvider appearance={clerkAppearance} dynamic waitlistUrl="/request-access">{children}</ClerkProvider>
       </body>
     </html>
   );

@@ -537,6 +537,13 @@ select {
   .text-silver { background: none; color: CanvasText; filter: none; }
 }
 
+/* Skeleton placeholder used while data loads. */
+.skeleton {
+  background: rgb(255 255 255 / 0.06);
+  border-radius: 8px;
+  animation: pulseSoft 1.6s ease-in-out infinite;
+}
+
 /* Sheet (components/ui/Sheet.tsx): slides from its edge. Exit keyframes set
    only the end state, so a drag-dismissed sheet leaves from where it was let go. */
 .sheet { animation: sheet-in-up var(--dur-slow) var(--ease-standard); }
@@ -557,6 +564,11 @@ select {
 /* Popover, Menu, Tooltip: fade + 4px rise (DESIGN.md §8). */
 .popover { animation: popover-in var(--dur-base) var(--ease-standard); }
 @keyframes popover-in { from { opacity: 0; transform: translateY(4px); } }
+
+@keyframes pulseSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
 
 /* Spinner (ui/Spinner.tsx): rings orbit the fixed star at different speeds. */
 .spinner-ring { transform-box: view-box; transform-origin: center; animation: spinner-orbit 2.4s linear infinite; }

@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import Sparkline from '@/components/discover/Sparkline';
 import { Change } from '@/components/ui/Change';
 import { X } from '@/components/ui/icons';
-import { Skeleton } from '@/components/ui/States';
 import { formatMoney, formatPct } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
 import type { Quote } from '@/types/api';
@@ -51,7 +50,7 @@ function Row({ symbol, detail, onRemove }: { symbol: string; detail?: string; on
       </th>
       <td className="whitespace-nowrap py-2 text-right tabular">
         {quote.error && !q ? <span className="text-fg-3">Unavailable</span>
-          : !q ? <Skeleton className="ml-auto w-5" />
+          : !q ? <span className="skeleton ml-auto block h-3 w-16" aria-label="Loading" />
           : <span className={q.stale ? 'text-warn' : ''} title={q.stale ? 'Stale price' : undefined}>
               {formatMoney(q.regularMarketPrice, q.currency)}
             </span>}

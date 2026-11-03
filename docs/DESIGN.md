@@ -235,7 +235,7 @@ Minimum target 44×44 everywhere (`min-h-11`). Compact table rows (36px) are all
 ## 5. Iconography
 
 - The set in `src/components/ui/icons.tsx`: iOS-style outline glyphs from Iconoir (MIT, paths vendored into the file, no package), 24px grid, 1.5px stroke, round caps and joins. Sizes 16 (inline), 20 (nav, buttons). Add a glyph there, taken from Iconoir so the style stays one family, rather than importing a library.
-- Loading spinner: `ui/Spinner.tsx`, the Polaris mark with its rings turning around the fixed star, in `currentColor`. It replaces generic spinners (buttons, Movers, Ask Polaris); data blocks still load with skeletons.
+- Loading spinner: `ui/Spinner.tsx`, the Polaris mark with its rings turning around the fixed star, in `currentColor`. One per loading section, never on small parts: `LoadingBlock` (spinner + label), the running desk step, backtests, deep analysis, buttons, Movers and Ask Polaris. Small placeholders (index tiles, prices, table cells, cards in a grid) stay quiet `Skeleton` bars; a page covered in spinners looks broken (owner, 2026-11-03).
 - Text labels come first. An icon appears where it does a job (navigation, close, search, direction, a tool) and always has a text label or `aria-label`.
 - Decorative icons get `aria-hidden="true"`.
 - No emoji anywhere.
@@ -301,7 +301,7 @@ Anything not on this list needs a decision in `MEMORY.md`. There are no page tra
 
 Primitives live in `src/components/ui/`. Domain components compose them; screens compose domain components. **A screen never styles a raw element that a primitive covers.**
 
-Every interactive component has six states: default, hover, focus-visible, active/pressed, disabled and loading. Every data component has five: loading (skeleton), empty, error (with retry), partial/stale (amber), and success.
+Every interactive component has six states: default, hover, focus-visible, active/pressed, disabled and loading. Every data component has five: loading (`LoadingBlock` for a section, `Skeleton` bars for small parts), empty, error (with retry), partial/stale (amber), and success.
 
 ### 7.1 Actions
 
