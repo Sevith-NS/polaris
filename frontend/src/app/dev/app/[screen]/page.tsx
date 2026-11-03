@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Suspense, type ReactNode } from 'react';
+import AIAssistant from '@/components/AIAssistant';
 import Alerts from '@/app/(app)/alerts/page';
 import Home from '@/app/(app)/home/page';
 import MarketsLayout from '@/app/(app)/markets/layout';
@@ -52,6 +53,7 @@ export default async function DevScreen({ params }: { params: Promise<{ screen: 
     <ToastProvider>
       <PortfolioProvider>
         <AppShell><Suspense>{render()}</Suspense></AppShell>
+        <Suspense fallback={null}><AIAssistant /></Suspense>
       </PortfolioProvider>
     </ToastProvider>
   );

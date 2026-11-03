@@ -78,6 +78,7 @@ const ASK = [
   ['The stock on your screen', 'Open a symbol and ask. It reads that stock’s plan levels, quant readings and news mood before it answers.'],
   ['Your paper portfolio', 'Positions and cash from your paper book, so “how risky is my portfolio” gets your numbers, not a template.'],
   ['Any company you name', 'Mention another ticker in the question and it pulls that one’s readings too.'],
+  ['Picks up where you left off', 'Every answer is kept in your own history. Reopen a chat later, or delete it.'],
   ['Explains, never advises', 'It walks you through what the numbers show. It never tells you to buy or sell.'],
 ] as const;
 

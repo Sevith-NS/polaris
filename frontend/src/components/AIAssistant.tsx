@@ -5,7 +5,9 @@ import { usePathname } from 'next/navigation';
 import { Fragment, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { MessageSquare, Send, X } from '@/components/ui/icons';
 import { usePortfolio } from '@/context/PortfolioContext';
-import { apiPost, errorMessage } from '@/lib/api';
+import { ApiError, apiGet, apiPost, errorMessage } from '@/lib/api';
+import type { ChatReply, ChatThread } from '@/types/chat';
+import { ChatHistory } from './ChatHistory';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; error?: boolean };
 
@@ -34,6 +36,9 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  // The saved chat these messages belong to; null until the first answer is kept.
+  const [threadId, setThreadId] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
@@ -67,8 +72,9 @@ export default function AIAssistant() {
     setInput('');
     setLoading(true);
     try {
-      const res = await apiPost<{ reply: string }>('/api/ai-chat', {
+      const res = await apiPost<ChatReply>('/api/ai-chat', {
         messages: next.slice(-20).map(({ role, content: c }) => ({ role, content: c })),
+        thread_id: threadId ?? undefined,
         symbol,
         portfolio: {
           currency: book?.account.currency,
@@ -77,11 +83,33 @@ export default function AIAssistant() {
         },
       });
       setMessages((m) => [...m, { role: 'assistant', content: res.reply }]);
+      if (res.thread_id) setThreadId(res.thread_id);
     } catch (err) {
+      // The chat was deleted elsewhere: the next question starts a new one.
+      if (err instanceof ApiError && err.status === 404) setThreadId(null);
       setMessages((m) => [...m, { role: 'assistant', content: errorMessage(err), error: true }]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const newChat = () => {
+    setMessages([]);
+    setThreadId(null);
+    setShowHistory(false);
+    inputRef.current?.focus();
+  };
+
+  const openChat = async (id: string) => {
+    try {
+      const chat = await apiGet<ChatThread>(`/api/chats/${encodeURIComponent(id)}`);
+      setMessages(chat.messages.map(({ role, content }) => ({ role, content })));
+      setThreadId(chat.id);
+    } catch (err) {
+      setMessages([{ role: 'assistant', content: errorMessage(err), error: true }]);
+      setThreadId(null);
+    }
+    setShowHistory(false);
   };
 
   return (
@@ -97,17 +125,34 @@ export default function AIAssistant() {
       {open && (
         <section role="dialog" aria-modal="false" aria-labelledby="assistant-h"
                  className="glass-2 fixed inset-0 z-50 flex flex-col pt-[env(safe-area-inset-top,0px)] sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[min(640px,80vh)] sm:w-[400px] sm:rounded-2xl">
-          <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2">
-            <div>
+          <div className="flex items-center justify-between gap-2 border-b border-white/10 px-4 py-2">
+            <div className="min-w-0">
               <h2 id="assistant-h" className="text-body font-medium">Ask Polaris</h2>
-              <p className="text-caption text-fg-3">{symbol ? `Looking at ${symbol} and your portfolio` : 'Sees your paper portfolio'}</p>
+              <p className="truncate text-caption text-fg-3">{symbol ? `Looking at ${symbol} and your portfolio` : 'Sees your paper portfolio'}</p>
             </div>
-            <button type="button" onClick={close} aria-label="Close assistant"
-                    className="grid min-h-11 min-w-11 place-items-center text-fg-2 hover:text-fg">
-              <X />
-            </button>
+            <div className="flex shrink-0 items-center">
+              <button type="button" onClick={() => setShowHistory((v) => !v)} aria-pressed={showHistory}
+                      className="min-h-11 rounded-lg px-2.5 text-body-sm text-fg-2 hover:text-fg aria-pressed:bg-white/[0.08] aria-pressed:text-fg">
+                History
+              </button>
+              <button type="button" onClick={newChat} disabled={!messages.length && !threadId && !showHistory}
+                      className="min-h-11 rounded-lg px-2.5 text-body-sm text-fg-2 hover:text-fg disabled:opacity-40">
+                New chat
+              </button>
+              <button type="button" onClick={close} aria-label="Close assistant"
+                      className="grid min-h-11 min-w-11 place-items-center text-fg-2 hover:text-fg">
+                <X />
+              </button>
+            </div>
           </div>
 
+          {showHistory ? (
+            <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-4 text-body-sm">
+              <h3 className="text-caption text-fg-3">Your chats</h3>
+              <ChatHistory currentId={threadId} onOpen={openChat}
+                           onDeleted={(id) => { if (id === threadId) { setMessages([]); setThreadId(null); } }} />
+            </div>
+          ) : (
           <div ref={scrollRef} aria-live="polite" className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 text-body-sm">
             {messages.length === 0 && (
               <div className="flex flex-col gap-3">
@@ -131,6 +176,7 @@ export default function AIAssistant() {
             ))}
             {loading && <p role="status" className="text-fg-3">Reading the live data</p>}
           </div>
+          )}
 
           <form onSubmit={(e) => send(undefined, e)} className="border-t border-line p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
             <div className="flex items-end gap-2">

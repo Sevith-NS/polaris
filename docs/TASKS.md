@@ -172,7 +172,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 
 - [x] **T8.1** AI desk: fail fast on quota, stop when no analyst files, local model first (`OMNIROUTE_PRIMARY`), model part shared per symbol per day. `[BE]` `[M]`
 - [x] **T8.2** Deep Dive: saved teardown shows on open with its date, rewrite only when not today's, new copy. `[BE]` `[S]`
-- [ ] **T8.3** Apply migration `0006_research_runs.sql` to the branch local dev should use (owner call: `.env` points at production). Until then nothing is saved. `[S]`
+- [x] **T8.3** Apply migration `0006_research_runs.sql` to the branch local dev should use (owner call: `.env` points at production). Until then nothing is saved. `[S]` *(2026-11-03: applied to production with 0007, owner approved.)*
 - [ ] **T8.4** Shared market cache in Neon behind `data_source._cache_get` / `_cache_put`, so a serverless start isn't a cold cache. `[BE]` `[M]`
 - [ ] **T8.5** Movers board built by a scheduled job (`/internal/jobs/movers`, secret header, cron-job.org every 5 min in NSE hours), read as one row; drop the warming and batch-count UI. `[BE]` `[L]`
 - [ ] **T8.6** Shared client cache inside `useApi.ts`: one request per path, last data shown on return, quiet refresh. `[M]`
@@ -187,4 +187,4 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T9.4** Deep Dive layout: the one-liner first, sections grouped for reading, sources listed, a writing state with elapsed time. `[M]`
 - [x] **T9.5** Chart fills its card on the symbol Overview (no empty band under it). `[S]`
 - [x] **T9.6** Landing section for Ask Polaris (it reads the symbol on screen and your paper portfolio). `[S]`
-- [ ] **T9.7** Ask Polaris keeps a chat history per user: saved conversations, reopen, delete. `[BE]` `[M]`
+- [x] **T9.7** Ask Polaris keeps a chat history per user: saved conversations, reopen, delete. `[BE]` `[M]`
