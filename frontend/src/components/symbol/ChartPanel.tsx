@@ -109,11 +109,12 @@ export function ChartPanel({ symbol, levels }: { symbol: string; levels?: QuantL
           {data.interval} history is limited to {data.range} by the data provider (you asked for {data.requested_range}).
         </p>
       )}
-      <div style={{ minHeight: height }}>
+      {/* Grows with the card: on lg the grid row is as tall as the plan column beside it. */}
+      <div className="flex flex-1 flex-col" style={{ minHeight: height }}>
         {loading && !bars.length ? <Skeleton className="w-full" style={{ height }} />
           : error ? <ErrorState error={error} title="Couldn't load the chart" onRetry={reload} />
           : bars.length ? (
-            <Chart data={bars as Parameters<typeof Chart>[0]['data']} visibleBars={frame.visibleBars} height={height} symbol={symbol}
+            <Chart data={bars as Parameters<typeof Chart>[0]['data']} visibleBars={frame.visibleBars} height={height} fill symbol={symbol}
                    colors={{ priceLines }} onAddAlert={addAlert} />
           ) : <p className="py-12 text-center text-body-sm text-fg-2">No price history for this timeframe.</p>}
       </div>

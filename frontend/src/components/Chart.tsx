@@ -186,6 +186,8 @@ interface ChartProps {
    */
   visibleBars?: number;
   height?: number;
+  /** Grow past `height` to fill a taller flex parent (a card stretched by its grid row). */
+  fill?: boolean;
   /**
    * Instrument the drawings belong to. Drawings are stored in (time, price)
    * space under this key, so they follow the symbol across timeframe switches
@@ -213,7 +215,7 @@ interface ChartProps {
 }
 
 export default function Chart({
-  data, visibleBars, height = 400, symbol, drawingTools = true, colors = {}, onAddAlert,
+  data, visibleBars, height = 400, fill = false, symbol, drawingTools = true, colors = {}, onAddAlert,
 }: ChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartWrapRef = useRef<HTMLDivElement>(null);
@@ -586,7 +588,7 @@ export default function Chart({
   }, [colors.priceLines, data, rebuildEpoch]);
 
   return (
-    <div className="relative w-full">
+    <div className={fill ? 'relative flex w-full flex-1 flex-col' : 'relative w-full'}>
       {/* Indicator toolbar */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         {CHIP_META.map(({ key, label, color }) => {
@@ -686,7 +688,8 @@ export default function Chart({
       </div>
       {/* Rail sits outside the chart box so it never overlaps the price axis
           or eats crosshair hits; the chart flexes into whatever's left. */}
-      <div className="flex w-full items-stretch" style={{ height }}>
+      <div className={fill ? 'flex w-full flex-1 items-stretch' : 'flex w-full items-stretch'}
+           style={fill ? { minHeight: height } : { height }}>
         {drawingTools && (
           <DrawingRail
             activeTool={draw.activeTool}
