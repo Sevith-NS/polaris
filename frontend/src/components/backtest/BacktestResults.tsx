@@ -1,27 +1,67 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import clsx from 'clsx';
 import { ArrowDownRight, ArrowUpRight, Layers, ListOrdered, Ruler, TrendingUp } from '@/components/ui/icons';
+import { Change } from '@/components/ui/Change';
 import type { BacktestResult, MonthlyRow, Num, TradeRow } from '../../types/backtest';
 import { money, num, pct, ratio, shortDate, signedPct, toneFor } from '../../lib/backtest';
-import { MicroLabel } from '../agents/DeskAtoms';
+import { formatNumber } from '../../lib/format';
 import EquityChart from './EquityChart';
 import { tint } from '../../lib/theme';
 
 /* ------------------------------------------------------------------ atoms */
 
-function Headline({ label, value, tone, sub }: {
-  label: string; value: string; tone?: string; sub?: string;
-}) {
+const asPct = (v: Num) => (v === null || v === undefined ? null : v * 100);
+
+function Stat({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="rounded-xl well p-3">
-      <MicroLabel>{label}</MicroLabel>
-      <div className={clsx('mt-1 text-xl font-bold tabular', tone ?? 'text-fg')}>
-        {value}
-      </div>
-      {sub && <div className="mt-0.5 text-caption text-fg-3">{sub}</div>}
+    <div className="flex flex-col gap-1 lg:px-5 lg:first:pl-0">
+      <dt className="text-caption text-fg-3">{label}</dt>
+      <dd className="text-body font-medium tabular text-fg">{children}</dd>
     </div>
+  );
+}
+
+/**
+ * The answer first: did the rules beat simply holding, and at what cost. A
+ * positive return that lost to buy and hold is not a win, so the headline is
+ * the comparison, not the return.
+ */
+function Verdict({ result, currency }: { result: BacktestResult; currency: string }) {
+  const s = result.summary;
+  const gap = s.alpha_cagr;
+  const headline = gap === null || gap === undefined || s.bh_cagr === null || s.bh_cagr === undefined
+    ? 'There is no buy and hold comparison for this range.'
+    : gap > 0.0005 ? `The strategy beat buy and hold by ${formatNumber(gap * 100, 1)} points a year.`
+    : gap < -0.0005 ? `Buy and hold did better, by ${formatNumber(-gap * 100, 1)} points a year.`
+    : 'The strategy matched buy and hold.';
+  return (
+    <section aria-labelledby="bt-verdict" className="glass rounded-xl p-5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span className="rounded-md border border-warn/50 bg-warn/10 px-1.5 py-0.5 text-micro uppercase text-warn">In-sample</span>
+        <span className="text-caption text-fg-3">
+          {shortDate(s.start)} to {shortDate(s.end)} · {num(s.years, 1)} years · {formatNumber(result.bars, 0)} bars
+        </span>
+      </div>
+      <h3 id="bt-verdict" className="mt-3 text-h4 text-fg">{headline}</h3>
+      <p className="mt-1 max-w-prose text-body-sm text-fg-2">
+        {money(s.initial, currency)} became {money(s.final, currency)} with the strategy, which was in the
+        market {pct(s.exposure, 0)} of the time.
+      </p>
+      <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-line pt-4 sm:grid-cols-3 lg:flex lg:flex-wrap lg:divide-x lg:divide-line">
+        <Stat label="Strategy, a year"><Change pct={asPct(s.cagr)} /></Stat>
+        <Stat label="Buy and hold, a year"><Change pct={asPct(s.bh_cagr)} /></Stat>
+        <Stat label="Worst drop"><Change pct={asPct(s.max_dd)} /></Stat>
+        <Stat label="Buy and hold worst drop"><Change pct={asPct(s.bh_max_dd)} /></Stat>
+        <Stat label="Sharpe">{num(s.sharpe)}</Stat>
+        <Stat label="Trades">{s.n_trades} · {pct(s.win_rate, 0)} won</Stat>
+      </dl>
+      <p className="mt-4 text-caption text-fg-3">
+        In-sample means these figures come from the same history the rules are judged on, so they flatter
+        the rules. Robustness shows the part held out of sight.
+      </p>
+    </section>
   );
 }
 
@@ -63,10 +103,8 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
  */
 function monthTint(value: Num, extreme: number): string | undefined {
   if (value === null || value === undefined || !Number.isFinite(value)) return undefined;
-  const weight = Math.min(Math.abs(value) / (extreme || 1), 1) * 0.55 + 0.06;
-  return value >= 0
-    ? `rgba(47, 191, 113, ${weight.toFixed(3)})`
-    : `rgba(229, 72, 77, ${weight.toFixed(3)})`;
+  const weight = Math.min(Math.abs(value) / (extreme || 1), 1) * 55 + 6;
+  return tint(value >= 0 ? 'var(--green)' : 'var(--red)', Math.round(weight));
 }
 
 function MonthlyGrid({ rows }: { rows: MonthlyRow[] }) {
@@ -208,66 +246,19 @@ export default function BacktestResults({ result, currency }: {
   const s = result.summary;
   const e = result.extended;
   const bench = e.benchmark;
-  const beatBuyHold = (s.alpha_cagr ?? 0) > 0;
 
   return (
     <div className="space-y-4">
-      {/* ---- Headline numbers ---- */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-        <Headline
-          label="CAGR" value={signedPct(s.cagr)} tone={toneFor(s.cagr)}
-          sub={`buy & hold ${signedPct(s.bh_cagr)}`}
-        />
-        <Headline
-          label="Sharpe" value={num(s.sharpe)}
-          tone={(s.sharpe ?? 0) >= 1 ? 'text-up' : undefined}
-          sub={`sortino ${num(s.sortino)}`}
-        />
-        <Headline
-          label="Max drawdown" value={pct(s.max_dd)} tone="text-down"
-          sub={`${s.dd_bars} bars underwater`}
-        />
-        <Headline
-          label="Profit factor" value={ratio(s.profit_factor)}
-          tone={(s.profit_factor ?? 0) >= 1.5 ? 'text-up' : undefined}
-          sub={`win rate ${pct(s.win_rate, 1)}`}
-        />
-        <Headline
-          label="Trades" value={String(s.n_trades)}
-          sub={`${num(s.trades_per_year, 1)}/yr · ${pct(s.exposure, 0)} in market`}
-        />
-        <Headline
-          label="Final equity" value={money(s.final, currency)}
-          tone={toneFor((s.final ?? 0) - s.initial)}
-          sub={`from ${money(s.initial, currency)}`}
-        />
-      </div>
+      <Verdict result={result} currency={currency} />
 
-      {/* ---- The one sentence that matters most ---- */}
-      <div
-        className="rounded-xl p-3 text-[12px] leading-relaxed"
-        style={{
-          border: `1px solid ${beatBuyHold ? tint('var(--green)', 25) : tint('var(--fg-2)', 25)}`,
-          background: beatBuyHold ? tint('var(--green)', 5) : tint('var(--fg-2)', 5),
-        }}
-      >
-        <span className="text-fg-2">
-          Over {num(s.years, 1)} years and {result.bars.toLocaleString()} bars, this strategy
-          returned <span className={clsx('font-semibold tabular', toneFor(s.cagr))}>{signedPct(s.cagr)}</span> a year
-          against buy &amp; hold&apos;s <span className="font-semibold tabular text-fg-2">{signedPct(s.bh_cagr)}</span>,
-          {' '}while in the market only <span className="font-semibold tabular text-fg-2">{pct(s.exposure, 0)}</span> of the time
-          {' '}and drawing down <span className="font-semibold tabular text-down">{pct(s.max_dd)}</span> at worst
-          {' '}(buy &amp; hold <span className="tabular">{pct(s.bh_max_dd)}</span>).
-        </span>
-      </div>
-
+      <div className="glass space-y-4 rounded-xl p-5">
       {/* ---- Equity curve + drawdown ---- */}
       <div className="rounded-xl well p-3">
-        <div className="mb-1 flex flex-wrap items-center justify-between gap-2 px-1">
-          <MicroLabel>Equity curve vs buy &amp; hold · drawdown below</MicroLabel>
+        <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2 px-1">
+          <h4 className="text-body-sm font-medium text-fg">Growth against buy and hold</h4>
           <span className="text-caption text-fg-3">
-            {shortDate(s.start)} → {shortDate(s.end)}
-            {result.equity.downsampled && ' · curve thinned for display'}
+            Solid line the strategy, dashed buy and hold, red how far below its last high
+            {result.equity.downsampled && ' · thinned for display'}
           </span>
         </div>
         <EquityChart
@@ -275,7 +266,7 @@ export default function BacktestResults({ result, currency }: {
           buyHold={result.buy_hold}
           drawdown={result.drawdown}
           interval={result.interval}
-          height={320}
+          height={340}
         />
       </div>
 
@@ -385,6 +376,7 @@ export default function BacktestResults({ result, currency }: {
       <Card title="Trade log" icon={<ArrowUpRight size={12} />}>
         <TradeTable trades={result.trades} currency={currency} />
       </Card>
+      </div>
     </div>
   );
 }

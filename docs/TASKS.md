@@ -112,7 +112,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T4.18** Symbol header v3 (Price, Change, session, ProvenanceChip, watchlist toggle, Paper trade button). `[M]`
 - [ ] **T4.19** Overview layout (chart 8 cols, plan KeyValueList 4 cols); chart theme reads CSS variables. `[M]`
 - [ ] **T4.20** Restyle AI Desk panels on Card/Panel/Badge; sources and "Model unavailable" states. `[L]`
-- [ ] **T4.21** Restyle Backtest lab and results; permanent amber In-sample badge. `[M]`
+- [x] **T4.21** Restyle Backtest lab and results; permanent amber In-sample badge. `[M]` *(2026-11-03: setup card, report and chart. The Robustness and Optimizer panels keep their v3 internals.)*
 - [ ] **T4.22** Restyle Fundamentals and News tabs. `[M]`
 
 ### Markets
