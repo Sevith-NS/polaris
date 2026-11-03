@@ -40,7 +40,7 @@ export function RealSummary({ accounts, label }: { accounts: Account[]; label: s
   const { data, rows, error, loading, reload } = useReal(accounts);
 
   if (loading && !data) {
-    return <div className="glass rounded-2xl p-6"><Skeleton className="h-10 w-full" /></div>;
+    return <div className="glass flex flex-wrap gap-8 rounded-2xl p-6"><Skeleton className="h-10 w-56" /><Skeleton className="h-10 w-32" /></div>;
   }
   if (error && !data) return <ErrorState error={error} title="Couldn't load your real holdings" onRetry={reload} />;
   if (!data) return null;

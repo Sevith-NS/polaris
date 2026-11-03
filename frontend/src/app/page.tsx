@@ -147,7 +147,7 @@ export default async function Landing() {
             logo={<Link href="/" data-logo aria-label="Polaris, back to top"><Wordmark large /></Link>}
             cta={<>
               <Show when="signed-out">
-                <Link href="/sign-up" className={buttonClass('primary', 'md', 'lift min-h-10 px-4')}>Request access</Link>
+                <Link href="/request-access" className={buttonClass('primary', 'md', 'lift min-h-10 px-4')}>Request access</Link>
               </Show>
               <Show when="signed-in">
                 <Link href="/home" className={buttonClass('primary', 'md', 'lift min-h-10 px-4')}>Open Polaris</Link>
@@ -179,7 +179,7 @@ export default async function Landing() {
                 </p>
                 <div className="mt-6 flex w-full flex-col items-stretch justify-center gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
                   <Show when="signed-out">
-                    <Link href="/sign-up" className={buttonClass('primary', 'md', 'lift appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Request access</Link>
+                    <Link href="/request-access" className={buttonClass('primary', 'md', 'lift appear appear--btn px-5')} style={{ '--d': '0.96s' } as CSSProperties}>Request access</Link>
                     <SignInButton><button className={buttonClass('secondary', 'md', 'lift appear appear--side px-5')} style={{ '--d': '1.10s' } as CSSProperties}>Sign in</button></SignInButton>
                   </Show>
                   <Show when="signed-in">
@@ -415,7 +415,7 @@ export default async function Landing() {
                 </h2>
                 <div className="flex flex-wrap justify-center gap-4">
                   <Show when="signed-out">
-                    <Link href="/sign-up" className={buttonClass('primary', 'lg')}>Request access</Link>
+                    <Link href="/request-access" className={buttonClass('primary', 'lg')}>Request access</Link>
                   </Show>
                   <Show when="signed-in">
                     <Link href="/home" className={buttonClass('primary', 'lg')}>Open Polaris</Link>

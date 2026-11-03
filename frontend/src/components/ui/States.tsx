@@ -4,13 +4,9 @@ import { errorMessage } from '@/lib/api';
 import { Button } from './Button';
 import { Spinner } from './Spinner';
 
-/** A placeholder the size of what is loading, with the Polaris spinner in it. */
+// Small placeholders (tiles, prices, cells) stay quiet bars; the spinner is for whole sections (LoadingBlock).
 export function Skeleton({ className, style }: { className?: string; style?: CSSProperties }) {
-  return (
-    <span aria-hidden="true" style={style} className={clsx('flex h-5 items-center justify-center', className)}>
-      <Spinner size={20} />
-    </span>
-  );
+  return <span aria-hidden="true" style={style} className={clsx('skeleton block h-3', className)} />;
 }
 
 /** The Polaris spinner and what is loading, in a status region screen readers announce. */
