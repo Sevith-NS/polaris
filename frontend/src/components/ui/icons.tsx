@@ -102,6 +102,9 @@ export const MoveUpRight = glyph('MoveUpRight', <><path d="M3 13L13 3" /><circle
 export const Rows3 = glyph('Rows3', <path d="M2 3.5h12M2 6.5h12M2 9.5h12M2 12.5h12" />);
 export const Eraser = glyph('Eraser', <path d="M6 13.5h7.5M2.5 10l6-6.5 4.5 4.5-6 6.5H5z M5.5 7l4.5 4.5" />);
 export const CircleDot = glyph('CircleDot', <><circle cx="8" cy="8" r="5.5" /><circle cx="8" cy="8" r="1.25" /></>);
+// Ask Polaris: show or hide the chats pane, and start a new chat.
+export const PanelLeft = glyph('PanelLeft', <><rect x="2" y="2.5" width="12" height="11" /><path d="M6.25 2.5v11" /></>);
+export const SquarePen = glyph('SquarePen', <path d="M13.5 9v4.5h-11v-11H7M11.25 2.25l2.5 2.5L8 10.5H5.5V8z" />);
 export const Settings2 = SlidersHorizontal;
 
 // Decorative in every current usage: render nothing.

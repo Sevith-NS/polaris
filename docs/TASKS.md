@@ -188,3 +188,5 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T9.5** Chart fills its card on the symbol Overview (no empty band under it). `[S]`
 - [x] **T9.6** Landing section for Ask Polaris (it reads the symbol on screen and your paper portfolio). `[S]`
 - [x] **T9.7** Ask Polaris keeps a chat history per user: saved conversations, reopen, delete. `[BE]` `[M]`
+- [x] **T9.8** Movers board fills in quietly: no warming, exclusion or coverage notes, a spinner while it scans. `[S]`
+- [x] **T9.9** Ask Polaris like a chat app: icon buttons (chats pane, new chat), a left chats pane grouped by day with generated titles and start times. `[BE]` `[M]`

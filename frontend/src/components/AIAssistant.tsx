@@ -3,13 +3,17 @@
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import { Fragment, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { MessageSquare, Send, X } from '@/components/ui/icons';
+import { MessageSquare, PanelLeft, Send, SquarePen, X } from '@/components/ui/icons';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { ApiError, apiGet, apiPost, errorMessage } from '@/lib/api';
+import { readStorage, useBrowserValue, useMediaQuery, writeStorage } from '@/lib/browser';
 import type { ChatReply, ChatThread } from '@/types/chat';
 import { ChatHistory } from './ChatHistory';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; error?: boolean };
+
+const PANE_KEY = 'flint.assistant.chats-pane';
 
 const SUGGESTIONS = [
   'How risky is my portfolio right now?',
@@ -38,7 +42,13 @@ export default function AIAssistant() {
   const [loading, setLoading] = useState(false);
   // The saved chat these messages belong to; null until the first answer is kept.
   const [threadId, setThreadId] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
+  // The chats pane: beside the chat from md up, over it on a phone. Remembered per browser.
+  const wide = useMediaQuery('(min-width: 768px)');
+  const storedPane = useBrowserValue(() => readStorage(PANE_KEY) === 'open', false);
+  const [paneOverride, setPaneOverride] = useState<boolean | null>(null);
+  const paneOpen = paneOverride ?? (storedPane && wide);
+  const [listKey, setListKey] = useState(0);
+  const titleTimer = useRef<number | undefined>(undefined);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
@@ -49,6 +59,13 @@ export default function AIAssistant() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages, loading]);
+
+  useEffect(() => () => window.clearTimeout(titleTimer.current), []);
+
+  const setPane = (next: boolean) => {
+    setPaneOverride(next);
+    if (wide) writeStorage(PANE_KEY, next ? 'open' : 'closed');
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -83,7 +100,15 @@ export default function AIAssistant() {
         },
       });
       setMessages((m) => [...m, { role: 'assistant', content: res.reply }]);
-      if (res.thread_id) setThreadId(res.thread_id);
+      if (res.thread_id) {
+        setThreadId(res.thread_id);
+        setListKey((k) => k + 1);
+        // A new chat is named by the server just after this reply; look again for the name.
+        if (!threadId) {
+          window.clearTimeout(titleTimer.current);
+          titleTimer.current = window.setTimeout(() => setListKey((k) => k + 1), 5000);
+        }
+      }
     } catch (err) {
       // The chat was deleted elsewhere: the next question starts a new one.
       if (err instanceof ApiError && err.status === 404) setThreadId(null);
@@ -96,7 +121,7 @@ export default function AIAssistant() {
   const newChat = () => {
     setMessages([]);
     setThreadId(null);
-    setShowHistory(false);
+    if (!wide) setPane(false);
     inputRef.current?.focus();
   };
 
@@ -109,7 +134,8 @@ export default function AIAssistant() {
       setMessages([{ role: 'assistant', content: errorMessage(err), error: true }]);
       setThreadId(null);
     }
-    setShowHistory(false);
+    // On a phone the pane covers the chat, so it gets out of the way once a chat is picked.
+    if (!wide) setPane(false);
   };
 
   return (
@@ -123,36 +149,45 @@ export default function AIAssistant() {
       )}
 
       {open && (
+        // 400px of chat, plus a 280px chats pane from md up when it is open.
         <section role="dialog" aria-modal="false" aria-labelledby="assistant-h"
-                 className="glass-2 fixed inset-0 z-50 flex flex-col pt-[env(safe-area-inset-top,0px)] sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[min(640px,80vh)] sm:w-[400px] sm:rounded-2xl">
-          <div className="flex items-center justify-between gap-2 border-b border-white/10 px-4 py-2">
-            <div className="min-w-0">
+                 className={clsx('glass-2 fixed inset-0 z-50 flex flex-col pt-[env(safe-area-inset-top,0px)] sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[min(680px,85vh)] sm:w-[400px] sm:rounded-2xl',
+                   paneOpen && 'md:w-[680px]')}>
+          <div className="flex items-center gap-1 border-b border-white/10 px-2 py-2">
+            <Tooltip content={paneOpen ? 'Hide chats' : 'Your chats'} placement="bottom">
+              <button type="button" onClick={() => setPane(!paneOpen)} aria-label={paneOpen ? 'Hide chats' : 'Show chats'}
+                      aria-expanded={paneOpen} aria-controls="assistant-chats"
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:bg-white/[0.06] hover:text-fg aria-expanded:text-fg">
+                <PanelLeft size={18} />
+              </button>
+            </Tooltip>
+            <div className="min-w-0 flex-1 px-1">
               <h2 id="assistant-h" className="text-body font-medium">Ask Polaris</h2>
               <p className="truncate text-caption text-fg-3">{symbol ? `Looking at ${symbol} and your portfolio` : 'Sees your paper portfolio'}</p>
             </div>
-            <div className="flex shrink-0 items-center">
-              <button type="button" onClick={() => setShowHistory((v) => !v)} aria-pressed={showHistory}
-                      className="min-h-11 rounded-lg px-2.5 text-body-sm text-fg-2 hover:text-fg aria-pressed:bg-white/[0.08] aria-pressed:text-fg">
-                History
+            <Tooltip content="New chat" placement="bottom">
+              <button type="button" onClick={newChat} aria-label="New chat" disabled={!messages.length && !threadId}
+                      className="grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:bg-white/[0.06] hover:text-fg disabled:opacity-40">
+                <SquarePen size={18} />
               </button>
-              <button type="button" onClick={newChat} disabled={!messages.length && !threadId && !showHistory}
-                      className="min-h-11 rounded-lg px-2.5 text-body-sm text-fg-2 hover:text-fg disabled:opacity-40">
-                New chat
-              </button>
-              <button type="button" onClick={close} aria-label="Close assistant"
-                      className="grid min-h-11 min-w-11 place-items-center text-fg-2 hover:text-fg">
-                <X />
-              </button>
-            </div>
+            </Tooltip>
+            <button type="button" onClick={close} aria-label="Close assistant"
+                    className="grid min-h-11 min-w-11 place-items-center rounded-lg text-fg-2 hover:bg-white/[0.06] hover:text-fg">
+              <X />
+            </button>
           </div>
 
-          {showHistory ? (
-            <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-4 text-body-sm">
-              <h3 className="text-caption text-fg-3">Your chats</h3>
-              <ChatHistory currentId={threadId} onOpen={openChat}
+          <div className="relative flex min-h-0 flex-1">
+          {paneOpen && (
+            <aside id="assistant-chats" aria-label="Chats"
+                   className={clsx('flex flex-col overflow-y-auto px-2 py-3',
+                     wide ? 'w-[280px] shrink-0 border-r border-white/10' : 'absolute inset-0 z-10 bg-ink-1')}>
+              <ChatHistory currentId={threadId} refreshKey={listKey} onOpen={openChat}
                            onDeleted={(id) => { if (id === threadId) { setMessages([]); setThreadId(null); } }} />
-            </div>
-          ) : (
+            </aside>
+          )}
+          {/* Under the phone overlay the chat is out of reach, for the keyboard too. */}
+          <div className="flex min-w-0 flex-1 flex-col" inert={paneOpen && !wide}>
           <div ref={scrollRef} aria-live="polite" className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 text-body-sm">
             {messages.length === 0 && (
               <div className="flex flex-col gap-3">
@@ -176,7 +211,6 @@ export default function AIAssistant() {
             ))}
             {loading && <p role="status" className="text-fg-3">Reading the live data</p>}
           </div>
-          )}
 
           <form onSubmit={(e) => send(undefined, e)} className="border-t border-line p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
             <div className="flex items-end gap-2">
@@ -193,6 +227,8 @@ export default function AIAssistant() {
             </div>
             <p className="mt-2 text-caption text-fg-3">Educational analysis on paper trades, not financial advice.</p>
           </form>
+          </div>
+          </div>
         </section>
       )}
     </>
