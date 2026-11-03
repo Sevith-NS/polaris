@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { direction, formatPct, formatSignedMoney } from './format';
+import { direction, formatDuration, formatPct, formatSignedMoney } from './format';
 import { EXCHANGES, sessionState } from './sessions';
 
 test('changes that round to zero are flat, with no sign', () => {
@@ -9,6 +9,12 @@ test('changes that round to zero are flat, with no sign', () => {
   assert.equal(formatSignedMoney(-0.004, 'USD'), '$0.00');
   assert.equal(direction(-0.006), 'down');
   assert.equal(formatPct(0.006), '+0.01%');
+});
+
+test('durations read in seconds, then minutes and seconds', () => {
+  assert.equal(formatDuration(8_900), '8s');
+  assert.equal(formatDuration(65_000), '1m 05s');
+  assert.equal(formatDuration(-20), '0s');
 });
 
 test('a closed exchange names its next session', () => {

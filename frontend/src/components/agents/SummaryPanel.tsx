@@ -4,6 +4,21 @@ import { BookOpen, TrendingUp, TrendingDown, Scale, Eye, Calculator } from '@/co
 import type { SummaryEvent } from '../../types/agents';
 import { ACCENT } from './deskFormat';
 import { MicroLabel, SeatError, TintPanel } from './DeskAtoms';
+import { LoadingBlock } from '@/components/ui/States';
+
+/** Where the summary will land while the chair is still writing it. */
+export function SummaryPending() {
+  return (
+    <div className="glass rounded-xl p-5">
+      <div className="mb-4 border-b border-line pb-3">
+        <h4 className="flex items-center gap-2 text-sm font-semibold text-fg-2">
+          <BookOpen size={15} /> Desk summary
+        </h4>
+      </div>
+      <LoadingBlock lines={4} label="Writing the desk summary" />
+    </div>
+  );
+}
 
 /**
  * The desk's balanced write-up: what the data shows, the strongest evidence

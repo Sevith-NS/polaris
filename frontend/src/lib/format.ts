@@ -73,6 +73,12 @@ export function direction(value: number | string | null | undefined, digits = 2)
   return n > 0 ? 'up' : 'down';
 }
 
+/** Elapsed time: "8s" under a minute, then "1m 05s". */
+export function formatDuration(ms: number): string {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s`;
+}
+
 export function timeAgo(iso: string | number | Date): string {
   const t = new Date(iso).getTime();
   if (!Number.isFinite(t)) return '';

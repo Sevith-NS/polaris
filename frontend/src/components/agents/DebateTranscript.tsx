@@ -1,11 +1,30 @@
 'use client';
 
 import clsx from 'clsx';
-import { TrendingUp, TrendingDown, Swords, Quote, Crosshair, Handshake, Hourglass } from '@/components/ui/icons';
-import type { DebateEvent } from '../../types/agents';
+import { TrendingUp, TrendingDown, Swords, Quote, Crosshair, Handshake } from '@/components/ui/icons';
+import type { DebateEvent, DebateSide } from '../../types/agents';
+import { Skeleton } from '@/components/ui/States';
 import { sideColor } from './deskFormat';
 import { MicroLabel, SeatError } from './DeskAtoms';
 import { tint } from '../../lib/theme';
+
+/** The next speaker's bubble, on its own side, while the model writes it. */
+function PendingTurn({ side }: { side: DebateSide }) {
+  const bull = side === 'BULL';
+  const label = bull ? 'The case for strength is opening' : 'The case for caution is answering';
+  return (
+    <div role="status" aria-label={label} className={clsx('flex w-full', bull ? 'justify-start' : 'justify-end')}>
+      <div className="w-full lg:max-w-[85%]">
+        <p className={clsx('mb-1.5 text-caption text-fg-3', !bull && 'lg:text-right')}>{label}</p>
+        <div className="flex flex-col gap-2 rounded-xl well p-4">
+          <Skeleton className="w-full" />
+          <Skeleton className="w-11/12" />
+          <Skeleton className="w-3/5" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Turn({ turn }: { turn: DebateEvent }) {
   const bull = turn.side === 'BULL';
@@ -96,12 +115,7 @@ export default function DebateTranscript({
       <div className="space-y-3">
         {turns.map((turn) => <Turn key={`${turn.round}-${turn.side}`} turn={turn} />)}
 
-        {pending && (
-          <div className="flex items-center gap-2 text-caption text-fg-3">
-            <Hourglass size={12} className="" />
-            the next speaker is composing their argument…
-          </div>
-        )}
+        {pending && turns.length < 2 && <PendingTurn side={turns.length === 0 ? 'BULL' : 'BEAR'} />}
       </div>
     </div>
   );

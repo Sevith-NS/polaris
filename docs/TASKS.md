@@ -182,7 +182,7 @@ Each primitive comes with all its states, keyboard support and a short usage com
 ## Phase 9: Owner review (2026-11-03)
 
 - [x] **T9.1** Desk debate is one exchange: strength opens, caution answers. The 1 to 4 rounds picker goes (rounds repeated round 1). `[BE]` `[S]`
-- [ ] **T9.2** Desk progress panel while it works: steps with status, elapsed time, which analysts have filed; skeletons where output will land. `[M]`
+- [x] **T9.2** Desk progress panel while it works: steps with status, elapsed time, which analysts have filed; skeletons where output will land. `[M]`
 - [ ] **T9.3** Deep Dive reads fresh data: company profile from yfinance, dated headlines with outlets, every section kept. `[BE]` `[M]`
 - [ ] **T9.4** Deep Dive layout: the one-liner first, sections grouped for reading, sources listed, a writing state with elapsed time. `[M]`
 - [ ] **T9.5** Chart fills its card on the symbol Overview (no empty band under it). `[S]`

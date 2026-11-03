@@ -2,7 +2,7 @@
 // globals.css tokens as `var()`, because several of these are consumed as
 // inline style values (tinted panels; see lib/theme tint).
 
-import type { DebateSide } from '../../types/agents';
+import type { DebateSide, DeskStage } from '../../types/agents';
 
 export const ACCENT = {
   green: 'var(--green)',
@@ -19,14 +19,14 @@ export const scoreColor = (score: number) =>
 
 export const ANALYST_ORDER = ['fundamentals', 'technical', 'news', 'sentiment'] as const;
 
-export const STAGE_LABELS: Record<string, string> = {
+export const STAGE_LABELS: Record<DeskStage, string> = {
   gather: 'Gathering data',
   analysts: 'Analyst team',
   debate: 'Debate',
   summary: 'Summary',
 };
 
-export const STAGE_ORDER = ['gather', 'analysts', 'debate', 'summary'];
+export const STAGE_ORDER: DeskStage[] = ['gather', 'analysts', 'debate', 'summary'];
 
 /** Unsigned percentage — sizes and shares of a book, where a "+" would be noise. */
 export const rawPct = (value: number | null | undefined, digits = 1) =>
