@@ -186,5 +186,5 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T9.3** Deep Dive reads fresh data: company profile from yfinance, dated headlines with outlets, every section kept. `[BE]` `[M]`
 - [x] **T9.4** Deep Dive layout: the one-liner first, sections grouped for reading, sources listed, a writing state with elapsed time. `[M]`
 - [x] **T9.5** Chart fills its card on the symbol Overview (no empty band under it). `[S]`
-- [ ] **T9.6** Landing section for Ask Polaris (it reads the symbol on screen and your paper portfolio). `[S]`
+- [x] **T9.6** Landing section for Ask Polaris (it reads the symbol on screen and your paper portfolio). `[S]`
 - [ ] **T9.7** Ask Polaris keeps a chat history per user: saved conversations, reopen, delete. `[BE]` `[M]`

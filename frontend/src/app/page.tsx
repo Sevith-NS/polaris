@@ -73,6 +73,14 @@ const DESK = [
   { seat: 'Risk committee', focus: 'Your rules', body: 'Checks the idea against limits you set, like the most one name may take of your book.', src: 'Your rules · your portfolio' },
 ];
 
+// What Ask Polaris reads before it answers (backend ai_assistant._build_context).
+const ASK = [
+  ['The stock on your screen', 'Open a symbol and ask. It reads that stock’s plan levels, quant readings and news mood before it answers.'],
+  ['Your paper portfolio', 'Positions and cash from your paper book, so “how risky is my portfolio” gets your numbers, not a template.'],
+  ['Any company you name', 'Mention another ticker in the question and it pulls that one’s readings too.'],
+  ['Explains, never advises', 'It walks you through what the numbers show. It never tells you to buy or sell.'],
+] as const;
+
 const RISK = [
   { label: 'One-day VaR, 95%', title: 'A bad day', note: 'About how much your holdings could lose on a bad day, one day in twenty.' },
   { label: 'Max drawdown', title: 'Deepest fall', note: 'The biggest peak-to-trough drop your holdings took over the period.' },
@@ -285,6 +293,22 @@ export default async function Landing() {
                 ))}
               </div>
               </div>
+            </div>
+          </section>
+
+          {/* ---------------------------------------------- ask polaris -- */}
+          <section id="ask" aria-labelledby="ask-h" className={`py-12 md:py-8 ${gutter}`}>
+            <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-2">
+              <SectionHead id="ask-h" kicker="Ask Polaris" title="Ask about what is on your screen."
+                           body="A chat that already knows which stock you have open and what your paper book holds, so you skip the copy and paste." />
+              <ul data-stagger className="flex flex-col">
+                {ASK.map(([t, b]) => (
+                  <li key={t} className="flex gap-4 border-t border-white/10 py-6">
+                    <span aria-hidden="true" className="ring-dot mt-0.5 shrink-0 text-fg" />
+                    <span><span className="block text-h4 font-medium">{t}</span><span className="mt-1 block text-body-sm text-fg-2">{b}</span></span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </section>
 
