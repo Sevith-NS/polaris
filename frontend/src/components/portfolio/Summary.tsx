@@ -18,7 +18,7 @@ export function PortfolioPulse() {
 function PaperPulse() {
   const { book, loading, error, refresh } = usePortfolio();
   if (loading && !book) {
-    return <div className="glass flex flex-wrap gap-8 rounded-2xl p-6"><Skeleton className="h-10 w-56" /><Skeleton className="h-10 w-32" /></div>;
+    return <div className="glass rounded-2xl p-6"><Skeleton className="h-10 w-full" /></div>;
   }
   if (error) return <ErrorState error={error} title="Couldn't load your portfolio" onRetry={() => void refresh()} />;
   if (!book) return null;

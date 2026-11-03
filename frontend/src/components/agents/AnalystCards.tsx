@@ -38,12 +38,7 @@ function PendingCard({ role }: { role: string }) {
         {NAMES[role]}
       </div>
       <MicroLabel className="mt-0.5">{REMITS[role]}</MicroLabel>
-      <Skeleton className="mt-3.5 h-1.5 w-full" />
-      <div className="mt-4 flex flex-col gap-2">
-        <Skeleton className="w-full" />
-        <Skeleton className="w-5/6" />
-        <Skeleton className="w-2/3" />
-      </div>
+      <Skeleton className="mt-4 h-20 w-full" />
     </div>
   );
 }

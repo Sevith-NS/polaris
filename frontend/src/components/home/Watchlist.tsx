@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Change } from '@/components/ui/Change';
 import { inputClass } from '@/components/ui/Field';
 import { X } from '@/components/ui/icons';
-import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
+import { EmptyState, ErrorState, LoadingBlock, Skeleton } from '@/components/ui/States';
 import { useToast } from '@/components/ui/Toast';
 import { apiDelete, apiGet, apiPost, errorMessage } from '@/lib/api';
 import { formatMoney } from '@/lib/format';
@@ -100,7 +100,7 @@ export function Watchlist() {
                         </Link>
                       </th>
                       <td className="py-2 text-right tabular">
-                        {q === undefined ? <span className="skeleton ml-auto block h-3 w-16" aria-label="Loading" />
+                        {q === undefined ? <Skeleton className="ml-auto w-5" />
                           : q === null ? <span className="text-fg-3">Unavailable</span>
                           : <span className={q.stale ? 'text-warn' : ''} title={q.stale ? 'Stale price' : undefined}>
                               {formatMoney(q.regularMarketPrice, q.currency)}

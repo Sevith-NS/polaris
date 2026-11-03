@@ -12,7 +12,7 @@ import { useUniverse, useUniverses } from '@/components/markets/universe';
 import { Button } from '@/components/ui/Button';
 import { Change } from '@/components/ui/Change';
 import { ArrowRight } from '@/components/ui/icons';
-import { EmptyState, ErrorState, Skeleton } from '@/components/ui/States';
+import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
 import { direction, formatMoney } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
 import type { DiscoverCard, DiscoverResponse } from '@/types/discover';
@@ -34,14 +34,7 @@ const toItem = (c: DiscoverCard): MoverItem => ({
 });
 
 function Loading() {
-  return (
-    <div role="status" aria-label="Loading this market" className="flex flex-col gap-5">
-      <Skeleton className="h-28 w-full rounded-2xl" />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
-        {Array.from({ length: 16 }, (_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
-      </div>
-    </div>
-  );
+  return <LoadingBlock lines={10} label="Loading this market" />;
 }
 
 function Overview() {

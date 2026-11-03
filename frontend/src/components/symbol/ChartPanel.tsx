@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import Chart from '@/components/Chart';
 import { AlertSheet, describeAlert } from '@/components/alerts/AlertSheet';
 import { NavAlerts } from '@/components/ui/icons';
-import { ErrorState, Skeleton } from '@/components/ui/States';
+import { ErrorState, LoadingBlock } from '@/components/ui/States';
 import { useToast } from '@/components/ui/Toast';
 import { readStorage, useBrowserValue, useMediaQuery, writeStorage } from '@/lib/browser';
 import { useApi } from '@/lib/useApi';
@@ -111,7 +111,7 @@ export function ChartPanel({ symbol, levels }: { symbol: string; levels?: QuantL
       )}
       {/* Grows with the card: on lg the grid row is as tall as the plan column beside it. */}
       <div className="flex flex-1 flex-col" style={{ minHeight: height }}>
-        {loading && !bars.length ? <Skeleton className="w-full" style={{ height }} />
+        {loading && !bars.length ? <LoadingBlock label="Loading the chart" className="flex-1" />
           : error ? <ErrorState error={error} title="Couldn't load the chart" onRetry={reload} />
           : bars.length ? (
             <Chart data={bars as Parameters<typeof Chart>[0]['data']} visibleBars={frame.visibleBars} height={height} fill symbol={symbol}

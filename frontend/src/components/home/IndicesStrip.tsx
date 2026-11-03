@@ -70,14 +70,14 @@ export function IndicesStrip() {
       <ul className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:px-0">
         {TILES.map((t) => {
           const p = pulses[t.market];
-          if (p.loading && !p.data) return <li key={t.symbol} className={tileClass}><Skeleton className="h-4 w-20" /><Skeleton className="h-6 w-28" /></li>;
+          if (p.loading && !p.data) return <li key={t.symbol} className={tileClass}><Skeleton className="h-11 w-28" /></li>;
           const row = p.data?.indices.find((r) => r.symbol === t.symbol);
           if (!row) return <Missing key={t.symbol} label={t.label} />;
           return <Tile key={t.symbol} label={t.label} href={`/s/${encodeURIComponent(t.symbol)}`} value={row.price}
                        pct={row.change_pct} open={p.data?.session.state === 'open'}
                        grouping={t.market === 'in' ? 'INR' : 'USD'} />;
         })}
-        {fx.loading && !fx.data ? <li className={tileClass}><Skeleton className="h-4 w-20" /><Skeleton className="h-6 w-28" /></li>
+        {fx.loading && !fx.data ? <li className={tileClass}><Skeleton className="h-11 w-28" /></li>
           : fx.data ? <Tile label="USD/INR" href="/s/USDINR%3DX" value={fx.data.rate} pct={null} grouping="INR" note="INR per USD" />
           : <Missing label="USD/INR" />}
       </ul>

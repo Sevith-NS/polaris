@@ -7,9 +7,9 @@ import { Panel } from '@/components/PageHeader';
 import { BreadthBar } from '@/components/home/MarketBreadth';
 import { Method } from '@/components/markets/Method';
 import { MoverTable, type MoverItem } from '@/components/markets/MoverTable';
-import { Loader2 } from '@/components/ui/icons';
 import { Segmented } from '@/components/ui/Segmented';
 import { Select } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
 import { formatNumber } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
@@ -99,7 +99,7 @@ function Movers() {
         {/* Owner, 2026-11-03: no warming or coverage notes, the scan just fills in behind this. */}
         {data?.warming && (
           <span role="status" className="grid min-h-11 min-w-11 shrink-0 place-items-center text-fg-3">
-            <Loader2 size={18} aria-hidden="true" className="animate-spin motion-reduce:animate-none" />
+            <Spinner size={22} />
             <span className="sr-only">Still scanning the market. The board fills in as prices arrive.</span>
           </span>
         )}

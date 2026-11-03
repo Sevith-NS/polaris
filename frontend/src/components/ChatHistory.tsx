@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Trash2 } from '@/components/ui/icons';
-import { Skeleton } from '@/components/ui/States';
+import { LoadingBlock } from '@/components/ui/States';
 import { apiDelete, apiGet, errorMessage } from '@/lib/api';
 import { formatDateTime, recencyGroup, type Recency } from '@/lib/format';
 import type { ChatSummary } from '@/types/chat';
@@ -46,11 +46,7 @@ export function ChatHistory({ currentId, refreshKey, onOpen, onDeleted }: {
 
   if (error && !chats) return <p role="alert" className="px-3 text-body-sm text-down">{error}</p>;
   if (!chats) {
-    return (
-      <div role="status" aria-label="Loading your chats" className="flex flex-col gap-4 px-3 pt-1">
-        {[0, 1, 2].map((i) => <div key={i} className="flex flex-col gap-1.5"><Skeleton className="w-4/5" /><Skeleton className="w-1/2" /></div>)}
-      </div>
-    );
+    return <LoadingBlock lines={5} label="Loading your chats" className="px-3" />;
   }
   if (!chats.length) {
     return <p className="px-3 text-body-sm text-fg-2">No chats yet. Your conversations will show up here.</p>;

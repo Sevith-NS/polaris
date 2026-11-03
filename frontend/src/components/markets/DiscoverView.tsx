@@ -14,7 +14,7 @@ import { useUniverse, useUniverses } from '@/components/markets/universe';
 import { Change } from '@/components/ui/Change';
 import { Segmented } from '@/components/ui/Segmented';
 import { Select } from '@/components/ui/Select';
-import { EmptyState, ErrorState, LoadingBlock, Skeleton } from '@/components/ui/States';
+import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { useApi } from '@/lib/useApi';
 import type {
@@ -32,11 +32,7 @@ const SIDES: { id: LevelSide | 'all'; label: string }[] = [
 const GRID = 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
 
 function CardsLoading({ tall = false }: { tall?: boolean }) {
-  return (
-    <div role="status" aria-label="Loading" className={GRID}>
-      {Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className={clsx('rounded-2xl', tall ? 'h-72' : 'h-48')} />)}
-    </div>
-  );
+  return <LoadingBlock lines={tall ? 12 : 8} />;
 }
 
 const decimals = (v: number | null | undefined) => (v == null ? 0 : (String(v).split('.')[1] ?? '').length);

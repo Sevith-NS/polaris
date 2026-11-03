@@ -1,9 +1,11 @@
 'use client';
 
 import clsx from 'clsx';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Fragment, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { MessageSquare, PanelLeft, Send, SquarePen, X } from '@/components/ui/icons';
+import { PanelLeft, Send, SquarePen, X } from '@/components/ui/icons';
+import { Spinner } from '@/components/ui/Spinner';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { ApiError, apiGet, apiPost, errorMessage } from '@/lib/api';
@@ -143,7 +145,7 @@ export default function AIAssistant() {
       {!open && (
         <button ref={launcherRef} type="button" onClick={() => setOpen(true)}
                 className="glass-2 fixed bottom-[calc(100px+env(safe-area-inset-bottom,0px))] right-4 z-30 flex min-h-11 items-center gap-2 rounded-full px-4 text-body-sm text-fg hover:brightness-125 lg:bottom-6 lg:right-6">
-          <MessageSquare size={16} />
+          <Image src="/polaris-mark.png" alt="" width={20} height={20} />
           Ask Polaris
         </button>
       )}
@@ -209,7 +211,11 @@ export default function AIAssistant() {
                 </div>
               </div>
             ))}
-            {loading && <p role="status" className="text-fg-3">Reading the live data</p>}
+            {loading && (
+              <p role="status" className="flex items-center gap-2 text-fg-3">
+                <Spinner size={24} /> Reading the live data
+              </p>
+            )}
           </div>
 
           <form onSubmit={(e) => send(undefined, e)} className="border-t border-line p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">

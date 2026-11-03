@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Check, CircleDot, Timer } from '@/components/ui/icons';
+import { Spinner } from '@/components/ui/Spinner';
 import type { AnalystEvent, DebateEvent, DeskStage } from '../../types/agents';
 import { formatDuration } from '../../lib/format';
 import { STAGE_LABELS, STAGE_ORDER } from './deskFormat';
@@ -21,7 +22,7 @@ const STATE_WORD: Record<StepState, string> = { done: 'done', active: 'in progre
 /**
  * What the desk is doing while it runs: each step with its state and time,
  * which analysts have filed, and the clock. A local model takes a minute or
- * two, so the wait shows real progress rather than a spinner.
+ * two, so the wait shows real progress, with the spinner on the running step.
  */
 export default function DeskProgress({
   symbol, stage, message, startedAt, stageStarts, analysts, debate,
@@ -81,7 +82,7 @@ export default function DeskProgress({
             <li key={key} className="flex items-start gap-3">
               <span className={clsx('mt-0.5 shrink-0',
                 state === 'active' ? 'text-fg' : state === 'done' ? 'text-fg-2' : 'text-fg-3/60')}>
-                {state === 'done' ? <Check size={14} /> : <CircleDot size={14} />}
+                {state === 'done' ? <Check size={14} /> : state === 'active' ? <Spinner size={16} /> : <CircleDot size={14} />}
               </span>
               <div className="min-w-0 flex-1">
                 <p className={clsx('text-body-sm',

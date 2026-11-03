@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { ChevronDown, RotateCw } from '@/components/ui/icons';
+import { ChevronDown } from '@/components/ui/icons';
+import { Spinner } from '@/components/ui/Spinner';
 import type { BacktestResult, StrategyInfo } from '../../types/backtest';
 import {
   BACKTEST_INTERVALS, BacktestRequest, fetchStrategies, runBacktest,
@@ -384,7 +385,7 @@ export default function BacktestSection({ symbol, currency }: {
 
         {running && (
           <p role="status" className="mt-4 flex items-center gap-2 text-body-sm text-fg-2">
-            <RotateCw size={14} aria-hidden="true" />
+            <Spinner size={18} />
             Pulling history and simulating every bar. Decades of daily bars take a few seconds.
           </p>
         )}

@@ -16,10 +16,8 @@ function PendingTurn({ side }: { side: DebateSide }) {
     <div role="status" aria-label={label} className={clsx('flex w-full', bull ? 'justify-start' : 'justify-end')}>
       <div className="w-full lg:max-w-[85%]">
         <p className={clsx('mb-1.5 text-caption text-fg-3', !bull && 'lg:text-right')}>{label}</p>
-        <div className="flex flex-col gap-2 rounded-xl well p-4">
-          <Skeleton className="w-full" />
-          <Skeleton className="w-11/12" />
-          <Skeleton className="w-3/5" />
+        <div className="rounded-xl well p-4">
+          <Skeleton className="h-12 w-full" />
         </div>
       </div>
     </div>

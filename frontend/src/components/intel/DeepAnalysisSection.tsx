@@ -1,5 +1,6 @@
 "use client";
-import { Microscope, Hourglass, WifiOff } from '@/components/ui/icons';
+import { Microscope, WifiOff } from '@/components/ui/icons';
+import { Spinner } from '@/components/ui/Spinner';
 import clsx from 'clsx';
 import { errorMessage } from '../../lib/api';
 import { useApi } from '../../lib/useApi';
@@ -56,7 +57,7 @@ export default function DeepAnalysisSection({ symbol, currency }: { symbol: stri
   if (loading && !data) {
     return (
       <div className="glass rounded-xl flex items-center gap-3 p-5">
-        <Hourglass size={16} className="text-fg-2" />
+        <Spinner size={22} className="shrink-0 text-fg-2" />
         <p className="text-sm text-fg-2">
           Running deep analysis for {symbol}. Reading statements, valuation history, phase and news…
         </p>
