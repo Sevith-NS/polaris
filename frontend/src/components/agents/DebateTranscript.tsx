@@ -69,22 +69,14 @@ function Turn({ turn }: { turn: DebateEvent }) {
 }
 
 /**
- * The strength/caution transcript, laid out as an argument rather than a document:
- * strength left, caution right, grouped by round. From round two each speaker is
- * required to answer a named claim, which is why "Answering" is a first-class
- * field instead of buried in the prose.
+ * The strength/caution exchange, laid out as an argument rather than a document:
+ * strength left, caution right. Caution has to answer a named claim, which is
+ * why "Answering" is a first-class field instead of buried in the prose.
  */
 export default function DebateTranscript({
-  turns, rounds, pending,
-}: { turns: DebateEvent[]; rounds: number; pending: boolean }) {
+  turns, pending,
+}: { turns: DebateEvent[]; pending: boolean }) {
   if (turns.length === 0 && !pending) return null;
-
-  const byRound = new Map<number, DebateEvent[]>();
-  for (const turn of turns) {
-    const bucket = byRound.get(turn.round) ?? [];
-    bucket.push(turn);
-    byRound.set(turn.round, bucket);
-  }
 
   return (
     <div className="glass rounded-xl p-5">
@@ -92,7 +84,7 @@ export default function DebateTranscript({
         <h4 className="flex items-center gap-2 text-sm font-semibold text-fg">
           <Swords size={15} className="text-fg-2" /> Debate
           <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-caption text-fg-3">
-            {rounds} {rounds === 1 ? 'round' : 'rounds'} · rebuttal required
+            one exchange · caution answers strength
           </span>
         </h4>
         <div className="flex items-center gap-3 text-caption text-fg-3">
@@ -101,18 +93,8 @@ export default function DebateTranscript({
         </div>
       </div>
 
-      <div className="space-y-5">
-        {[...byRound.entries()].map(([round, roundTurns]) => (
-          <div key={round} className="space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="text-caption text-fg-3">
-                Round {round} of {rounds}
-              </span>
-              <div className="h-px flex-1 bg-line" />
-            </div>
-            {roundTurns.map((turn) => <Turn key={`${turn.round}-${turn.side}`} turn={turn} />)}
-          </div>
-        ))}
+      <div className="space-y-3">
+        {turns.map((turn) => <Turn key={`${turn.round}-${turn.side}`} turn={turn} />)}
 
         {pending && (
           <div className="flex items-center gap-2 text-caption text-fg-3">

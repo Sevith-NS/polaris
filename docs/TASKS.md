@@ -178,3 +178,13 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [ ] **T8.6** Shared client cache inside `useApi.ts`: one request per path, last data shown on return, quiet refresh. `[M]`
 - [ ] **T8.7** One quotes request for watchlist rows (`/api/quotes?symbols=`) instead of one per row. `[BE]` `[M]`
 - [ ] **T8.8** Strategies from *151 Trading Strategies*: three moving averages (3.13), pivot support and resistance (3.14), channel mean reversion (3.15), time-series momentum (3.1/10.4), short-term reversal (10.3). `[BE]` `[M]`
+
+## Phase 9: Owner review (2026-11-03)
+
+- [x] **T9.1** Desk debate is one exchange: strength opens, caution answers. The 1 to 4 rounds picker goes (rounds repeated round 1). `[BE]` `[S]`
+- [ ] **T9.2** Desk progress panel while it works: steps with status, elapsed time, which analysts have filed; skeletons where output will land. `[M]`
+- [ ] **T9.3** Deep Dive reads fresh data: company profile from yfinance, dated headlines with outlets, every section kept. `[BE]` `[M]`
+- [ ] **T9.4** Deep Dive layout: the one-liner first, sections grouped for reading, sources listed, a writing state with elapsed time. `[M]`
+- [ ] **T9.5** Chart fills its card on the symbol Overview (no empty band under it). `[S]`
+- [ ] **T9.6** Landing section for Ask Polaris (it reads the symbol on screen and your paper portfolio). `[S]`
+- [ ] **T9.7** Ask Polaris keeps a chat history per user: saved conversations, reopen, delete. `[BE]` `[M]`

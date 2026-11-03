@@ -16,10 +16,7 @@ import DebateTranscript from './DebateTranscript';
 import SummaryPanel from './SummaryPanel';
 import RulesPanel from './RulesPanel';
 import DeskNotes from './DeskNotes';
-import { MicroLabel } from './DeskAtoms';
 import { STAGE_LABELS, STAGE_ORDER } from './deskFormat';
-
-const ROUND_OPTIONS = [1, 2, 3, 4];
 
 interface DeskState {
   context: ContextEvent | null;
@@ -91,7 +88,6 @@ export default function TradingDeskSection({
   symbol, currency,
 }: { symbol: string; currency: string }) {
   const [state, setState] = useState<DeskState>(EMPTY);
-  const [rounds, setRounds] = useState(2);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState('');
   const [notesKey, setNotesKey] = useState(0);
@@ -155,7 +151,7 @@ export default function TradingDeskSection({
     setError('');
     setRunning(true);
     try {
-      await streamDesk({ symbol, rounds, portfolio: { balance, positions } }, apply, controller.signal);
+      await streamDesk({ symbol, portfolio: { balance, positions } }, apply, controller.signal);
     } catch (e) {
       if ((e as Error)?.name === 'AbortError') return; // user stopped it, or the symbol changed
       setError(
@@ -190,34 +186,15 @@ export default function TradingDeskSection({
               </span>
             </h3>
             <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-fg-2">
-              Four analysts read {symbol} separately, the case for strength and the case for caution
-              argue it over {rounds} {rounds === 1 ? 'round' : 'rounds'}, and a balanced summary explains
-              the data and how the plan&apos;s levels were computed. &ldquo;Your rules&rdquo; then works out
-              what your own risk setting implies. Every figure comes from this platform&apos;s engines. The
-              desk explains. It never tells you what to do.
+              Four analysts read {symbol} separately. The case for strength opens and the case for
+              caution answers it, then a balanced summary explains the data and how the plan&apos;s levels
+              were computed. &ldquo;Your rules&rdquo; then works out what your own risk setting implies.
+              Every figure comes from this platform&apos;s engines. The desk explains. It never tells you
+              what to do.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div>
-              <MicroLabel className="mb-1">Debate rounds</MicroLabel>
-              <div className="flex overflow-hidden rounded-sm border border-white/15 bg-black/30">
-                {ROUND_OPTIONS.map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setRounds(option)}
-                    disabled={running}
-                    className={clsx(
-                      'min-h-8 px-2.5 text-caption font-semibold tabular transition-colors disabled:opacity-50',
-                      rounds === option ? 'bg-fg text-ink-0' : 'text-fg-3 hover:text-fg-2',
-                    )}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {running ? (
               <button
                 onClick={stop}
@@ -312,7 +289,6 @@ export default function TradingDeskSection({
 
       <DebateTranscript
         turns={debate}
-        rounds={context?.rounds ?? rounds}
         pending={running && Boolean(context) && analysts.length === 4 && !summary}
       />
 

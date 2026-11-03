@@ -10,7 +10,6 @@ import type { DeskEvent, JournalResponse } from '../types/agents';
 
 export interface DeskRunRequest {
   symbol: string;
-  rounds?: number;
   portfolio?: {
     balance: number;
     positions: { symbol: string; shares: number; averagePrice: number }[];
@@ -22,7 +21,7 @@ export class DeskRateLimited extends Error {
   retryAfter: number | null;
   constructor(retryAfter: number | null) {
     super(
-      `Rate limited. A desk run is roughly a dozen model calls, so it has its own quota. Try again in ${
+      `Rate limited. A desk run is about seven model calls, so it has its own quota. Try again in ${
         retryAfter ?? 'a few'
       } seconds.`,
     );
