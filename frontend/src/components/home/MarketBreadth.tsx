@@ -7,7 +7,7 @@ import { ErrorState, LoadingBlock } from '@/components/ui/States';
 import { Tabs } from '@/components/ui/Tabs';
 import { usePortfolio } from '@/context/PortfolioContext';
 import { formatNumber } from '@/lib/format';
-import { useApi } from '@/lib/useApi';
+import type { ApiState } from '@/lib/useApi';
 import type { MarketPulse } from '@/types/api';
 
 type Market = 'in' | 'us';
@@ -68,13 +68,14 @@ function SectorTable({ pulse }: { pulse: MarketPulse }) {
   );
 }
 
-/** Market breadth and sector heat for India or the US (docs/DESIGN.md §9.1). */
-export function MarketBreadth() {
+/** Market breadth and sector heat for India or the US (docs/DESIGN.md §9.1). The pulses
+ *  come from Home, shared with IndicesStrip, so switching market needs no new request. */
+export function MarketBreadth({ pulses }: { pulses: Record<Market, ApiState<MarketPulse>> }) {
   const { profile } = usePortfolio();
   const [choice, setChoice] = useState<Market | null>(null);
   // Until the person picks, lead with the market they trade.
   const market: Market = choice ?? (profile && !profile.markets.includes('india') && profile.markets.includes('us') ? 'us' : 'in');
-  const { data, error, loading, reload } = useApi<MarketPulse>(`/api/markets/pulse?market=${market}`, { refreshMs: 60_000 });
+  const { data, error, loading, reload } = pulses[market];
 
   return (
     <Panel level={2} id="breadth-h" title="Market breadth" bodyClassName="flex flex-col gap-4">

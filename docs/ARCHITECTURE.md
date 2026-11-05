@@ -37,7 +37,7 @@ Rules that follow from this:
 | Motion | GSAP 3 + `@gsap/react`, Locomotive Scroll 5 | Locomotive and ScrollTrigger on the landing page only |
 | Tests | `node:test` via `tsx --test "src/**/*.test.ts"` | Pure logic in `src/lib` |
 | Lint | ESLint 9, `eslint-config-next` core-web-vitals + TS | Zero warnings is the bar |
-| Hosting | Vercel | `next build`; every page is dynamic so the CSP nonce reaches scripts |
+| Hosting | Vercel | `next build`; every page is dynamic so the CSP nonce reaches scripts. Functions run in `cle1` (Cleveland, AWS us-east-2, set in `frontend/vercel.json`), the region of the API and its Neon database, so the BFF and SSR calls stay in one region. |
 
 ---
 

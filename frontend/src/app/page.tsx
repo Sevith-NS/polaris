@@ -131,8 +131,10 @@ export default async function Landing() {
         {/* The landing's background: one full-strength loop pinned behind
             every section. LandingMotion plays it only when motion is allowed
             (otherwise the first frame stays) and fades in the dim layer as
-            the hero scrolls away, so later text stays AA over the bright band. */}
-        <video data-hero-video aria-hidden="true" muted loop playsInline preload="auto" poster="/hero/poster.jpg"
+            the hero scrolls away, so later text stays AA over the bright band.
+            preload="none": the 3.7 MB file loads when play() asks for it, after
+            the page's scripts, and never for reduced-motion visitors. */}
+        <video data-hero-video aria-hidden="true" muted loop playsInline preload="none" poster="/hero/poster.webp"
                className="pointer-events-none fixed inset-0 -z-20 size-full object-cover">
           <source src="/hero/hero.mp4" type="video/mp4" />
         </video>

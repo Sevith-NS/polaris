@@ -32,6 +32,9 @@ export async function serverGet<T>(path: string): Promise<T | null> {
     const res = await fetch(`${API_URL}${path}`, {
       headers: { authorization: `Bearer ${token}` },
       cache: 'no-store',
+      // A hung API must not hold the page render; null is already the outage path.
+      // 10 s covers the API's cold start (Python + pandas imports).
+      signal: AbortSignal.timeout(10_000),
     });
     return res.ok ? ((await res.json()) as T) : null;
   } catch {

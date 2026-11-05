@@ -190,3 +190,4 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T9.7** Ask Polaris keeps a chat history per user: saved conversations, reopen, delete. `[BE]` `[M]`
 - [x] **T9.8** Movers board fills in quietly: no warming, exclusion or coverage notes, a spinner while it scans. `[S]`
 - [x] **T9.9** Ask Polaris like a chat app: icon buttons (chats pane, new chat), a left chats pane grouped by day with generated titles and start times. `[BE]` `[M]`
+- [x] **T9.10** Speed checklist pass: Home polls each market pulse once, the first `/api/me` is reused from the server, Gemini and `serverGet` get timeouts, the alerts check is one UPDATE, functions run in the database's region (`cle1`), the landing video loads only when it plays and its poster is WebP. `[BE]` `[S]`
