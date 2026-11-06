@@ -61,16 +61,6 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
           gsap.ticker.lagSmoothing(0);
         });
 
-        // In-page anchors go through Locomotive so the smooth scroll isn't fought.
-        const anchors = q<HTMLAnchorElement>('[data-anchor]');
-        const onAnchor = (e: MouseEvent) => {
-          const href = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
-          if (!href || !loco) return;
-          e.preventDefault();
-          loco.scrollTo(href, { offset: -80, duration: 1.2 });
-        };
-        anchors.forEach((a) => a.addEventListener('click', onAnchor));
-
         // The logo returns to the top through Locomotive, not a same-page reload.
         const logo = q<HTMLAnchorElement>('[data-logo]')[0];
         const onLogo = (e: MouseEvent) => {
@@ -156,7 +146,6 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
 
         return () => {
           cancelled = true;
-          anchors.forEach((a) => a.removeEventListener('click', onAnchor));
           logo?.removeEventListener('click', onLogo);
           loco?.destroy();
           gsap.ticker.lagSmoothing(500, 33);

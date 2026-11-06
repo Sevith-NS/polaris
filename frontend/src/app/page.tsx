@@ -3,7 +3,6 @@ import { Instrument_Serif } from 'next/font/google';
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 import { LandingMotion } from '@/components/landing/LandingMotion';
-import { LandingNav } from '@/components/landing/LandingNav';
 import { FxCard, MarketCard, getLandingMarkets, tapeItems, Change } from '@/components/landing/LiveMarkets';
 import { PlanChart } from '@/components/landing/PlanChart';
 import { LEVELS } from '@/components/landing/planData';
@@ -145,17 +144,18 @@ export default async function Landing() {
         <header data-nav className={`fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)] ${gutter}`}>
           {/* No band, no border: a blur and a dark wash that fade into the page. */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[150%] bg-gradient-to-b from-ink-0/90 via-ink-0/55 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_45%,transparent)]" />
-          <LandingNav
-            logo={<Link href="/" data-logo aria-label="Polaris, back to top"><Wordmark large /></Link>}
-            cta={<>
+          {/* Logo and one action: the page is read by scrolling, so no section links. */}
+          <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-2 md:h-20">
+            <Link href="/" data-logo aria-label="Polaris, back to top" className="appear appear--scale"><Wordmark large /></Link>
+            <div className="appear appear--scale" style={{ '--d': '0.34s' } as CSSProperties}>
               <Show when="signed-out">
                 <Link href="/request-access" className={buttonClass('primary', 'md', 'lift min-h-10 px-4')}>Request access</Link>
               </Show>
               <Show when="signed-in">
                 <Link href="/home" className={buttonClass('primary', 'md', 'lift min-h-10 px-4')}>Open Polaris</Link>
               </Show>
-            </>}
-          />
+            </div>
+          </div>
         </header>
 
         <main>
