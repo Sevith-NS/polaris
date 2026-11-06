@@ -8,6 +8,7 @@
  * this context only caches what /api/accounts returns and re-reads it after
  * every order. Prices for orders are set by the server, never sent from here.
  */
+import { useRouter } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { apiGet, apiPost } from '@/lib/api';
 import { onBrokersChanged } from '@/lib/brokers';
@@ -43,6 +44,7 @@ export function PortfolioProvider({ children, initialProfile = null }: { childre
   const [book, setBook] = useState<PositionsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
+  const router = useRouter();
 
   const refresh = useCallback(async () => {
     const reuseProfile = serverProfile.current;
@@ -53,6 +55,9 @@ export function PortfolioProvider({ children, initialProfile = null }: { childre
         apiGet<{ accounts: Account[] }>('/api/accounts'),
       ]);
       if (me) setProfile(me);
+      // The layout lets people in when it couldn't read the profile (outage, timeout).
+      // This copy can tell: someone who hasn't finished onboarding goes there now.
+      if (me && !me.onboarded) router.replace('/onboarding');
       setAccounts(accounts.accounts);
       // Real (broker) accounts are read-only; this context drives paper trading.
       const acct = accounts.accounts.find((a) => a.kind === 'paper') ?? null;
@@ -64,7 +69,7 @@ export function PortfolioProvider({ children, initialProfile = null }: { childre
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     // Initial load; every later refresh is triggered by an order or a retry.

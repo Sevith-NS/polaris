@@ -8,7 +8,7 @@ import { errorMessage } from '@/lib/api';
 import { readStorage, writeStorage } from '@/lib/browser';
 import { useApi } from '@/lib/useApi';
 import { toOption, useSymbolSearch, type SymbolOption } from '@/lib/useSymbolSearch';
-import { WATCHLIST_CHANGED, addToWatchlist } from '@/lib/watchlist';
+import { addToWatchlist } from '@/lib/watchlist';
 import type { Watchlist } from '@/types/api';
 import { Search, X } from '@/components/ui/icons';
 
@@ -49,7 +49,6 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
   const { results, status, error } = useSymbolSearch(query);
   const lists = useApi<{ watchlists: Watchlist[] }>(open ? '/api/watchlists' : null);
   const watchlist = lists.data?.watchlists[0];
-  const reloadLists = lists.reload;
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -60,11 +59,6 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
     }
     if (!open && el.open) el.close();
   }, [open]);
-
-  useEffect(() => {
-    window.addEventListener(WATCHLIST_CHANGED, reloadLists);
-    return () => window.removeEventListener(WATCHLIST_CHANGED, reloadLists);
-  }, [reloadLists]);
 
   // Read on render while open: recents are a small, local convenience.
   const recent = open ? readRecent() : [];

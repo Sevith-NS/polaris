@@ -175,8 +175,8 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T8.3** Apply migration `0006_research_runs.sql` to the branch local dev should use (owner call: `.env` points at production). Until then nothing is saved. `[S]` *(2026-11-03: applied to production with 0007, owner approved.)*
 - [ ] **T8.4** Shared market cache in Neon behind `data_source._cache_get` / `_cache_put`, so a serverless start isn't a cold cache. `[BE]` `[M]`
 - [ ] **T8.5** Movers board built by a scheduled job (`/internal/jobs/movers`, secret header, cron-job.org every 5 min in NSE hours), read as one row; drop the warming and batch-count UI. `[BE]` `[L]`
-- [ ] **T8.6** Shared client cache inside `useApi.ts`: one request per path, last data shown on return, quiet refresh. `[M]`
-- [ ] **T8.7** One quotes request for watchlist rows (`/api/quotes?symbols=`) instead of one per row. `[BE]` `[M]`
+- [x] **T8.6** Shared client cache inside `useApi.ts`: one request per path, last data shown on return, quiet refresh. `[M]`
+- [x] **T8.7** One quotes request for watchlist rows (`/api/quotes?symbols=`) instead of one per row. `[BE]` `[M]`
 - [ ] **T8.8** Strategies from *151 Trading Strategies*: three moving averages (3.13), pivot support and resistance (3.14), channel mean reversion (3.15), time-series momentum (3.1/10.4), short-term reversal (10.3). `[BE]` `[M]`
 
 ## Phase 9: Owner review (2026-11-03)
@@ -191,3 +191,6 @@ Each primitive comes with all its states, keyboard support and a short usage com
 - [x] **T9.8** Movers board fills in quietly: no warming, exclusion or coverage notes, a spinner while it scans. `[S]`
 - [x] **T9.9** Ask Polaris like a chat app: icon buttons (chats pane, new chat), a left chats pane grouped by day with generated titles and start times. `[BE]` `[M]`
 - [x] **T9.10** Speed checklist pass: Home polls each market pulse once, the first `/api/me` is reused from the server, Gemini and `serverGet` get timeouts, the alerts check is one UPDATE, functions run in the database's region (`cle1`), the landing video loads only when it plays and its poster is WebP. `[BE]` `[S]`
+- [x] **T9.11** Ask Polaris streams its reply as the model writes it (SSE); the Gemini fallback only before the first piece; the turn is saved once complete. `[BE]` `[M]`
+- [x] **T9.12** Instant toggles: watchlist add and remove, alert pause, resume, re-arm and delete show at once through the shared cache and roll back on failure. `[S]`
+- [x] **T9.13** Onboarding gate in the browser too: when the layout couldn't read the profile, an unfinished onboarding still redirects. `[S]`

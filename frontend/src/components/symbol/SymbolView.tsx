@@ -21,7 +21,7 @@ import { describe, normalizeQuote, useFxRate } from '@/lib/instrument';
 import { exchangeFor, sessionState } from '@/lib/sessions';
 import { sizeByRisk } from '@/lib/sizing';
 import { useApi } from '@/lib/useApi';
-import { WATCHLIST_CHANGED, addToWatchlist, removeFromWatchlist } from '@/lib/watchlist';
+import { addToWatchlist, removeFromWatchlist } from '@/lib/watchlist';
 import type { Quote, Watchlist } from '@/types/api';
 import type { Failed, NewsIntel } from '@/types/intel';
 import type { MlInsights, QuantSignals } from '@/types/quant';
@@ -86,15 +86,11 @@ export function SymbolView({ symbol }: { symbol: string }) {
   }, [book, profile, levels, fx, fractional]);
 
   const listsApi = useApi<{ watchlists: Watchlist[] }>('/api/watchlists');
-  const reloadLists = listsApi.reload;
-  useEffect(() => {
-    window.addEventListener(WATCHLIST_CHANGED, reloadLists);
-    return () => window.removeEventListener(WATCHLIST_CHANGED, reloadLists);
-  }, [reloadLists]);
   const holding = (listsApi.data?.watchlists ?? []).filter((w) => w.symbols.includes(symbol)).map((w) => w.id);
 
   const toggleWatch = async () => {
-    setWatching(true);
+    // With a list to change, the button flips at once (optimistic); creating the first list waits.
+    setWatching(!listsApi.data?.watchlists.length);
     try {
       if (holding.length) {
         await removeFromWatchlist(symbol, holding);
