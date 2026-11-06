@@ -41,7 +41,7 @@ const HERO_FACTS = [
     ),
   },
   {
-    text: 'Broker holdings sync read-only',
+    text: 'Broker holdings sync',
     icon: (
       <svg aria-hidden="true" viewBox="0 0 24 24" className={factIcon}>
         <rect x="2.4" y="2.4" width="19.2" height="19.2" rx="6.2" fill="#fff" />
@@ -50,7 +50,7 @@ const HERO_FACTS = [
     ),
   },
   {
-    text: 'Paper money never added to real',
+    text: 'Paper money never mixed with real',
     icon: (
       <svg aria-hidden="true" viewBox="0 0 24 24" className={factIcon}>
         <circle cx="9" cy="12" r="6.6" fill="none" stroke="#e8e8e8" strokeWidth="1.6" />
@@ -110,10 +110,10 @@ const COMPARE: { row: string; cells: [string, string, string, string] }[] = [
 ];
 
 const FAQ: [string, ReactNode][] = [
-  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk. Polaris does the arithmetic and shows its working.'],
+  ['Is this investment advice?', 'No. Polaris is a software tool. It is not registered with SEBI as an Investment Adviser or Research Analyst, and never tells you what to buy or sell. You pick the stock, the method and the risk. Polaris does the math and shows if its working.'],
   ['Who sets the entry and stop?', 'You do, by choosing the method and your risk per trade. Every formula and every input is on screen, and plans only place paper orders.'],
   ['Where does the data come from, and how old is it?', 'Market data comes from Yahoo Finance and NSE public pages, and news from Google News. Quotes can be delayed. Every figure shows its source and time.'],
-  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else. There is no order button on a real account. The access token is encrypted into a cookie in your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
+  ['What can Polaris do with my broker login?', 'Read your holdings and today’s positions. Nothing else. There is no order button on a real account. The access token is encrypted into your own browser, sent only to read your holdings, and never stored on our servers. Disconnect any time and it is gone.'],
   ['How does Polaris make money?', 'It doesn’t yet. It’s free during the beta. We take no commissions from brokers, basket managers or referrals, and no stock is ever featured for pay.'],
   ['When do US brokers come?', 'US markets are live today. Syncing US broker holdings is planned. Until then Polaris says so plainly instead of pretending.'],
   ['How do I delete my data?', 'Settings → Delete account removes everything Polaris stores, and Settings → Export gives you a copy first.'],
@@ -177,7 +177,7 @@ export default async function Landing() {
                 </h1>
                 <p className="appear appear--soft mt-4 max-w-[470px] text-[16.5px] leading-[1.55] tracking-[-0.015em] text-fg-3 md:text-[15.5px] min-[1600px]:max-w-[540px] min-[1600px]:text-[18px]"
                    style={{ '--d': '0.82s', animationDuration: '1.25s' } as CSSProperties}>
-                  Sync your Indian broker read-only, follow both markets live, and test every idea on paper with maths you can see.
+                  Sync your brokers, follow all the markets, and test every idea on paper with the maths you can see.
                 </p>
                 <div className="mt-6 flex w-full flex-col items-stretch justify-center gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
                   <Show when="signed-out">
@@ -253,7 +253,6 @@ export default async function Landing() {
                 <div className="glass rounded-2xl p-4 md:p-6">
                   <p className="mb-4 flex items-center justify-between">
                     <span className={`${micro} text-fg`}>Example · Daily candles</span>
-                    <span className="text-caption text-fg-3">Illustrative, not market data</span>
                   </p>
                   <PlanChart />
                 </div>
@@ -273,7 +272,6 @@ export default async function Landing() {
                       <dd className="text-right">Risk ÷ (entry − stop)<span className="ml-2 text-caption text-fg-3">you pick the risk</span></dd>
                     </div>
                   </dl>
-                  <p className="mt-auto pt-4 text-caption text-fg-3">Prices fill in from the live quote when you open a symbol. You set every rule.</p>
                 </div>
               </div>
             </div>
@@ -283,7 +281,7 @@ export default async function Landing() {
           <section id="desk" aria-labelledby="desk-h" className={`relative isolate py-12 md:py-8 ${gutter}`}>
             <div className="mx-auto flex max-w-[1400px] flex-col gap-12">
               <SectionHead id="desk-h" kicker="AI desk" title="An AI desk that shows its work."
-                           body="Four seats explain what they see, with their sources on the table. They describe and never tell you to buy or sell. When a model is down, the card says so instead of guessing." />
+                           body="Four seats explain what they see, with their sources on the table. They describe and never tell you to buy or sell." />
               <div className="relative isolate">
               <div data-stagger className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 {DESK.map((d, i) => (
@@ -340,7 +338,7 @@ export default async function Landing() {
               <ul data-stagger className="flex flex-col">
                 {[
                   ['Read-only broker access', 'Polaris can see your holdings. It can never place an order on a real account.'],
-                  ['Your broker token stays with you', 'It is encrypted into a cookie in your own browser and only used to read. Nothing about your broker account is stored on our servers.'],
+                  ['Your broker token stays with you', 'It is encrypted and stored in your own browser and only used to read. Nothing about your broker account is stored on our servers.'],
                   ['No commissions, no featured stocks', 'We take nothing from brokers, basket managers or referrals, and never promote a stock for pay.'],
                   ['Your login, protected', 'Sign-in by Clerk with two-step verification. Polaris never stores a password.'],
                   ['Paper is always labelled', 'Simulated money is marked in blue on every screen and never added to real totals. Every paper trade stays on record, losers included.'],
@@ -382,9 +380,6 @@ export default async function Landing() {
                     ))}
                   </tbody>
                 </table>
-                <p className="border-t border-white/[0.07] p-4 text-caption text-fg-3">
-                  From each company&apos;s public pages, October 2026. Something changed? Tell us and we&apos;ll correct it.
-                </p>
               </div>
             </div>
           </section>
@@ -458,7 +453,6 @@ function PortfolioFace({ mode }: { mode: 'real' | 'paper' }) {
       {paper && <span aria-hidden="true" className="absolute inset-x-6 top-0 h-0.5 rounded-full bg-paper" />}
       <p className="flex items-center justify-between">
         <span className={`pill ${paper ? 'text-paper' : 'text-fg'}`}>{paper ? 'Paper' : 'Real'}</span>
-        <span className="text-caption text-fg-2">{paper ? 'Swing book · simulated' : 'Zerodha · read-only'}</span>
       </p>
       <p className="mt-5 text-[clamp(1.75rem,3vw,2.5rem)] font-medium leading-none tracking-[-0.03em]">
         {paper ? 'Your paper book' : 'Your broker holdings'}
@@ -471,7 +465,6 @@ function PortfolioFace({ mode }: { mode: 'real' | 'paper' }) {
           </div>
         ))}
       </dl>
-      <p className="mt-4 text-caption text-fg-3">{paper ? 'Never added to your real net worth.' : 'Read-only. No order buttons on real accounts.'}</p>
     </div>
   );
 }
