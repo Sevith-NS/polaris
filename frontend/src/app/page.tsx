@@ -91,7 +91,7 @@ function SectionHead({ kicker, title, body, id }: { kicker: string; title: React
   return (
     <div className="flex max-w-3xl flex-col gap-5">
       <span data-reveal className={`pill w-fit ${micro}`}>{kicker}</span>
-      <h2 id={id} data-split className="text-silver text-[clamp(2.25rem,5vw,4.5rem)] font-normal leading-[1] tracking-[-0.035em]">
+      <h2 id={id} data-split className="text-silver text-[clamp(2.25rem,5vw,4.5rem)] font-normal leading-[1.2] tracking-[-0.035em]">
         {title}
       </h2>
       {body && <p data-reveal className="max-w-xl text-body text-fg-2 md:text-h4 md:font-normal">{body}</p>}
@@ -324,7 +324,7 @@ export default async function Landing() {
                 {RISK.map((r) => (
                   <div key={r.label} className="glass flex flex-col gap-3 rounded-2xl p-6">
                     <dt className={`${micro} text-fg-3`}>{r.label}</dt>
-                    <dd className="text-silver text-[clamp(2rem,3.5vw,3rem)] font-normal leading-none tracking-[-0.03em]">{r.title}</dd>
+                    <dd className="text-silver text-[clamp(2rem,3.5vw,3rem)] font-normal leading-[1.2] tracking-[-0.03em]">{r.title}</dd>
                     <dd className="text-body-sm text-fg-2">{r.note}</dd>
                   </div>
                 ))}
@@ -412,7 +412,7 @@ export default async function Landing() {
             <div className={`relative z-10 mx-auto flex max-w-[1400px] justify-center py-28 md:py-40 ${gutter}`}>
               <div data-reveal className="glass-hero flex w-full max-w-3xl flex-col items-center gap-8 rounded-[28px] px-6 py-16 text-center md:px-16">
                 <span className={`pill ${micro} text-fg`}>Invite only</span>
-                <h2 id="close-h" data-split className="text-silver max-w-[14ch] text-[clamp(2.5rem,6vw,5rem)] font-normal leading-[1] tracking-[-0.04em]">
+                <h2 id="close-h" data-split className="text-silver max-w-[14ch] text-[clamp(2.5rem,6vw,5rem)] font-normal leading-[1.2] tracking-[-0.04em]">
                   Know what you own.
                 </h2>
                 <div className="flex flex-wrap justify-center gap-4">
