@@ -15,7 +15,7 @@ import { EmptyState, ErrorState, LoadingBlock } from '@/components/ui/States';
 import { useToast } from '@/components/ui/Toast';
 import { apiDelete, apiPatch, apiPost, errorMessage } from '@/lib/api';
 import { useApi } from '@/lib/useApi';
-import { WATCHLIST_CHANGED, removeFromWatchlist } from '@/lib/watchlist';
+import { addToWatchlist, removeFromWatchlist } from '@/lib/watchlist';
 import type { Watchlist } from '@/types/api';
 
 // Mirrors the API (routers/watchlists.py).
@@ -87,11 +87,6 @@ function WatchlistsPage() {
   const [dialog, setDialog] = useState<{ open: boolean; list?: Watchlist }>({ open: false });
   const [hidden, setHidden] = useState<string[]>([]);
 
-  useEffect(() => {
-    window.addEventListener(WATCHLIST_CHANGED, reload);
-    return () => window.removeEventListener(WATCHLIST_CHANGED, reload);
-  }, [reload]);
-
   const lists = (data?.watchlists ?? []).filter((w) => !hidden.includes(w.id));
   const list = lists.find((w) => w.id === params.get('list')) ?? lists[0];
   const select = (id: string) => router.replace(`${pathname}?list=${id}`, { scroll: false });
@@ -103,7 +98,7 @@ function WatchlistsPage() {
       await removeFromWatchlist(symbol, [list.id]);
       toast.show({
         message: `Removed ${symbol} from ${list.name}`,
-        action: { label: 'Undo', onClick: () => { void apiPost(`/api/watchlists/${list.id}/items`, { symbol }).then(reload); } },
+        action: { label: 'Undo', onClick: () => { addToWatchlist(symbol, list.id).catch((err) => toast.show({ message: errorMessage(err), tone: 'error' })); } },
       });
     } catch (err) {
       toast.show({ message: errorMessage(err), tone: 'error' });

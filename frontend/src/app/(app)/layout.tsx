@@ -22,7 +22,7 @@ export default async function SignedInLayout({ children }: { children: ReactNode
   return (
     <UserStorage userId={userId}>
       <ToastProvider>
-        <PortfolioProvider>
+        <PortfolioProvider initialProfile={profile}>
           <AppShell>{children}</AppShell>
           <Suspense fallback={null}>
             <AIAssistant />

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Change } from '@/components/ui/Change';
 import { Skeleton } from '@/components/ui/States';
 import { formatNumber, timeAgo } from '@/lib/format';
-import { useApi } from '@/lib/useApi';
+import { useApi, type ApiState } from '@/lib/useApi';
 import type { FxQuote, MarketPulse } from '@/types/api';
 
 const REFRESH_MS = 60_000;
@@ -56,13 +56,11 @@ function Missing({ label }: { label: string }) {
   );
 }
 
-/** India and US headline indices plus USD/INR, with session state. Delayed data, labelled. */
-export function IndicesStrip() {
-  const india = useApi<MarketPulse>('/api/markets/pulse?market=in', { refreshMs: REFRESH_MS });
-  const us = useApi<MarketPulse>('/api/markets/pulse?market=us', { refreshMs: REFRESH_MS });
+/** India and US headline indices plus USD/INR, with session state. Delayed data, labelled.
+ *  The pulses come from Home, which shares them with MarketBreadth (one request per market). */
+export function IndicesStrip({ pulses }: { pulses: Record<'in' | 'us', ApiState<MarketPulse>> }) {
   const fx = useApi<FxQuote>('/api/fx?pair=USDINR', { refreshMs: REFRESH_MS });
-  const pulses = { in: india, us };
-  const updated = [india.data?.computed_at, us.data?.computed_at].filter(Boolean).sort()[0];
+  const updated = [pulses.in.data?.computed_at, pulses.us.data?.computed_at].filter(Boolean).sort()[0];
 
   return (
     <section aria-labelledby="indices-h" className="flex flex-col gap-2">

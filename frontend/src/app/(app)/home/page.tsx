@@ -13,6 +13,7 @@ import { useNow } from '@/lib/browser';
 import { EXCHANGES, sessionState } from '@/lib/sessions';
 import { useApi } from '@/lib/useApi';
 import type { JournalResponse } from '@/types/agents';
+import type { MarketPulse } from '@/types/api';
 
 function Sessions() {
   const now = useNow();
@@ -80,15 +81,20 @@ function RecentNotes() {
 }
 
 export default function Home() {
+  // One poll per market, read by both the index strip and the breadth panel.
+  const pulses = {
+    in: useApi<MarketPulse>('/api/markets/pulse?market=in', { refreshMs: 60_000 }),
+    us: useApi<MarketPulse>('/api/markets/pulse?market=us', { refreshMs: 60_000 }),
+  };
   return (
     <div className="flex flex-col gap-6">
       <PageHeader level={1} title="Today" className="mb-2" />
       {/* Market first (docs/DESIGN.md §9.1); the full Home layout is T4.6. */}
-      <IndicesStrip />
+      <IndicesStrip pulses={pulses} />
       <PortfolioPulse />
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div className="flex min-w-0 flex-col gap-4">
-          <MarketBreadth />
+          <MarketBreadth pulses={pulses} />
           <TopMovers />
           <Watchlist />
         </div>

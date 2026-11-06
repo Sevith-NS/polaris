@@ -8,9 +8,10 @@ import { PanelLeft, Send, SquarePen, X } from '@/components/ui/icons';
 import { Spinner } from '@/components/ui/Spinner';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { usePortfolio } from '@/context/PortfolioContext';
-import { ApiError, apiGet, apiPost, errorMessage } from '@/lib/api';
+import { ApiError, DATA_UNAVAILABLE, apiGet, apiStream, errorMessage } from '@/lib/api';
 import { readStorage, useBrowserValue, useMediaQuery, writeStorage } from '@/lib/browser';
-import type { ChatReply, ChatThread } from '@/types/chat';
+import { readSseStream } from '@/lib/sse';
+import type { ChatEvent, ChatThread } from '@/types/chat';
 import { ChatHistory } from './ChatHistory';
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string; error?: boolean };
@@ -90,8 +91,19 @@ export default function AIAssistant() {
     setMessages(next);
     setInput('');
     setLoading(true);
+    const saved = (id: string | null) => {
+      if (!id) return;
+      setThreadId(id);
+      setListKey((k) => k + 1);
+      // A new chat is named by the server just after this reply; look again for the name.
+      if (!threadId) {
+        window.clearTimeout(titleTimer.current);
+        titleTimer.current = window.setTimeout(() => setListKey((k) => k + 1), 5000);
+      }
+    };
+    const reply = { started: false, failure: '' };
     try {
-      const res = await apiPost<ChatReply>('/api/ai-chat', {
+      const res = await apiStream('/api/ai-chat', {
         messages: next.slice(-20).map(({ role, content: c }) => ({ role, content: c })),
         thread_id: threadId ?? undefined,
         symbol,
@@ -100,25 +112,29 @@ export default function AIAssistant() {
           cash_balance: book ? Number(book.cash) : undefined,
           positions: positions.slice(0, 12).map((p) => ({ symbol: p.symbol, quantity: p.shares, average_cost: p.averagePrice })),
         },
+        stream: true,
       });
-      setMessages((m) => [...m, { role: 'assistant', content: res.reply }]);
-      if (res.thread_id) {
-        setThreadId(res.thread_id);
-        setListKey((k) => k + 1);
-        // A new chat is named by the server just after this reply; look again for the name.
-        if (!threadId) {
-          window.clearTimeout(titleTimer.current);
-          titleTimer.current = window.setTimeout(() => setListKey((k) => k + 1), 5000);
-        }
-      }
+      // The reply fills in as the model writes it.
+      await readSseStream<ChatEvent>(res, (ev) => {
+        if (ev.type === 'delta') {
+          const first = !reply.started;
+          reply.started = true;
+          setMessages((m) => (first ? [...m, { role: 'assistant', content: ev.text }]
+            : [...m.slice(0, -1), { ...m[m.length - 1], content: m[m.length - 1].content + ev.text }]));
+        } else if (ev.type === 'error') reply.failure = ev.message;
+        else saved(ev.thread_id);
+      });
+      if (reply.failure || !reply.started) throw new ApiError(reply.failure || DATA_UNAVAILABLE, 503, 'unavailable');
     } catch (err) {
       // The chat was deleted elsewhere: the next question starts a new one.
       if (err instanceof ApiError && err.status === 404) setThreadId(null);
-      setMessages((m) => [...m, { role: 'assistant', content: errorMessage(err), error: true }]);
+      // A cut-off answer is replaced, not left half said: the server kept nothing of it either.
+      setMessages((m) => [...(reply.started ? m.slice(0, -1) : m), { role: 'assistant', content: errorMessage(err), error: true }]);
     } finally {
       setLoading(false);
     }
   };
+  const writing = loading && messages[messages.length - 1]?.role === 'assistant';
 
   const newChat = () => {
     setMessages([]);
@@ -190,7 +206,8 @@ export default function AIAssistant() {
           )}
           {/* Under the phone overlay the chat is out of reach, for the keyboard too. */}
           <div className="flex min-w-0 flex-1 flex-col" inert={paneOpen && !wide}>
-          <div ref={scrollRef} aria-live="polite" className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 text-body-sm">
+          {/* Busy while a reply streams in, so screen readers read it once, whole. */}
+          <div ref={scrollRef} aria-live="polite" aria-busy={writing} className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 text-body-sm">
             {messages.length === 0 && (
               <div className="flex flex-col gap-3">
                 <p className="text-fg-2">Ask about your positions, risk, or the plan on screen. Answers cite the live numbers Polaris has.</p>
@@ -211,7 +228,7 @@ export default function AIAssistant() {
                 </div>
               </div>
             ))}
-            {loading && (
+            {loading && !writing && (
               <p role="status" className="flex items-center gap-2 text-fg-3">
                 <Spinner size={24} /> Reading the live data
               </p>

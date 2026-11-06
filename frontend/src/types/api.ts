@@ -175,7 +175,12 @@ export type Quote = {
   fiftyTwoWeekHigh?: number;
   fiftyTwoWeekLow?: number;
   stale?: boolean;
+  /** Set when no price could be had for this symbol (batch quotes). */
+  error?: string;
 };
+
+/** GET /api/quotes?symbols=A,B: quotes and a month of daily closes, keyed by symbol. */
+export type QuotesResponse = { quotes: Record<string, Quote>; closes: Record<string, number[]> };
 
 export type SearchResult = {
   symbol: string;

@@ -26,7 +26,8 @@ export class ApiError extends Error {
 
 type ErrorBody = { error?: string; code?: string; ref?: string };
 
-async function request<T>(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+/** The response when it is ok; otherwise the ApiError a person should see. */
+async function send(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<Response> {
   let res: Response;
   try {
     res = await fetch(`${API_BASE}${path}`, {
@@ -39,19 +40,26 @@ async function request<T>(method: string, path: string, body?: unknown, signal?:
     if ((err as Error).name === 'AbortError') throw err;
     throw new ApiError('You appear to be offline. Check your connection and try again.', 0, 'offline');
   }
-  if (res.status === 204) return undefined as T;
-  const data = (await res.json().catch(() => null)) as (T & ErrorBody) | null;
   if (!res.ok) {
+    const data = (await res.json().catch(() => null)) as ErrorBody | null;
     const retry = Number(res.headers.get('retry-after')) || undefined;
     throw new ApiError(data?.error || DATA_UNAVAILABLE, res.status, data?.code, data?.ref, retry);
   }
-  return data as T;
+  return res;
+}
+
+async function request<T>(method: string, path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
+  const res = await send(method, path, body, signal);
+  if (res.status === 204) return undefined as T;
+  return (await res.json().catch(() => null)) as T;
 }
 
 export const apiGet = <T = unknown>(path: string, signal?: AbortSignal) => request<T>('GET', path, undefined, signal);
 export const apiPost = <T = unknown>(path: string, body: unknown) => request<T>('POST', path, body);
 export const apiPatch = <T = unknown>(path: string, body: unknown) => request<T>('PATCH', path, body);
 export const apiDelete = <T = unknown>(path: string, body?: unknown) => request<T>('DELETE', path, body);
+/** A POST answered with Server-Sent Events: the open response, to read with readSseStream. */
+export const apiStream = (path: string, body: unknown) => send('POST', path, body);
 
 /** Message to show a person for any thrown value. */
 export function errorMessage(err: unknown): string {

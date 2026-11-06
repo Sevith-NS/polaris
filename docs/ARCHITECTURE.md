@@ -37,7 +37,7 @@ Rules that follow from this:
 | Motion | GSAP 3 + `@gsap/react`, Locomotive Scroll 5 | Locomotive and ScrollTrigger on the landing page only |
 | Tests | `node:test` via `tsx --test "src/**/*.test.ts"` | Pure logic in `src/lib` |
 | Lint | ESLint 9, `eslint-config-next` core-web-vitals + TS | Zero warnings is the bar |
-| Hosting | Vercel | `next build`; every page is dynamic so the CSP nonce reaches scripts |
+| Hosting | Vercel | `next build`; every page is dynamic so the CSP nonce reaches scripts. Functions run in `cle1` (Cleveland, AWS us-east-2, set in `frontend/vercel.json`), the region of the API and its Neon database, so the BFF and SSR calls stay in one region. |
 
 ---
 
@@ -115,9 +115,10 @@ Dependency direction is one-way: `app → components/<domain> → components/ui 
 
 | Where | How | Notes |
 |---|---|---|
-| Server component or layout | `serverGet<T>(path)` (`lib/server-api.ts`) | Returns `null` on any failure; the caller decides what an outage means. `cache: 'no-store'`. |
-| Client component | `useApi<T>(path, { refreshMs })` (`lib/useApi.ts`) | Abortable, keeps the last good data on reload, polls only while the tab is visible. |
-| Streams | `lib/sse.ts` | AI desk and chat (SSE through the BFF). |
+| Server component or layout | `serverGet<T>(path)` (`lib/server-api.ts`) | Returns `null` on any failure or after 10 s; the caller decides what an outage means. `cache: 'no-store'`. |
+| Client component | `useApi<T>(path, { refreshMs })` (`lib/useApi.ts`) | One shared in-memory store keyed by path: one request per path at a time, the last data shown at once when a view returns (quiet refresh), every reader of a path updated together, polls only while the tab is visible. `optimistic(path, update, write)` shows a write at once and rolls back on failure. Cleared when another user signs in. |
+| Watchlist rows | `useQuotes(symbols)` (`lib/useQuotes.ts`) | One `/api/quotes` request for a whole list (quote + month of closes), refreshed every minute. |
+| Streams | `lib/sse.ts`, `apiStream` (`lib/api.ts`) | AI desk, backtests and Ask Polaris replies (SSE through the BFF). |
 
 ### 5.2 Writes
 
@@ -143,6 +144,8 @@ Built 2026-10-15 in `algo-trader-backend` (migration `0003_real_accounts_alerts.
 | Performance | `GET /api/accounts/{id}/performance?period=1m\|3m\|6m\|1y\|ytd\|all` → `{twr_pct, xirr_pct, xirr_note, series: [{date, value, index}], benchmark: {symbol, name, return_pct, series}, method, start, end}`. XIRR is null under 30 days of history. Real accounts are measured from daily sync snapshots, so history starts at the first sync; `method` explains the limits. |
 | Alerts | `GET /api/alerts?status=` · `POST /api/alerts {symbol, kind: 'price_above' \| 'price_below' \| 'move_pct', threshold, note?}` · `PATCH /api/alerts/{id} {threshold?, note?, status?: 'active' \| 'paused'}` (active re-arms a triggered alert) · `DELETE /api/alerts/{id}` · `GET /api/alerts/firings?limit=` → `{firings[], unseen, note}` · `POST /api/alerts/firings/seen`. One-shot: a fired alert moves to `triggered`. No background worker: alerts are checked when the app lists alerts or polls firings, at most once a minute per user, on delayed quotes; stale quotes never fire. Poll firings every 60s for the bell (T4.29). |
 | Watchlists | `GET/POST /api/watchlists`, `PATCH/DELETE /api/watchlists/{id}`, `POST /api/watchlists/{id}/items`, `DELETE /api/watchlists/{id}/items/{symbol}` |
+| Batch quotes | `GET /api/quotes?symbols=A,B,...` (1 to 250) → `{quotes: {SYM: Quote}, closes: {SYM: [close, ...]}}`, a month of daily closes. One Yahoo spark call per 20 uncached symbols; same fields and previous-close rule as `/api/quote`. A symbol Yahoo can't price has `error`; last good data while Yahoo fails comes back with `stale: true`. |
+| Ask Polaris | `POST /api/ai-chat {messages, thread_id?, symbol?, portfolio?, stream: true}` → SSE: `{type: 'delta', text}` as the model writes, then `{type: 'done', thread_id}` once the turn is saved, or `{type: 'error', message}` (nothing saved). Without `stream` it answers one JSON `{reply, thread_id}`. |
 
 Brokers: Zerodha Kite only (read-only holdings). Upstox and US brokers are not built (PRD §III.6).
 
@@ -152,7 +155,7 @@ Brokers: Zerodha Kite only (read-only holdings). Upstox and US brokers are not b
 
 | State | Lives in | Why |
 |---|---|---|
-| Server data | Backend; fetched per view with `useApi` / `serverGet` | No client cache layer yet. Add one (SWR-like) only if duplicate requests become measurable. |
+| Server data | Backend; `useApi`'s shared in-memory store in the browser, `serverGet` on the server | One request per path, instant data on return, writes shown before the server confirms. Never `localStorage`, and dropped when another user signs in. |
 | Selected portfolio | URL `?p=` + `PortfolioContext` | Deep-linkable; context avoids prop drilling |
 | UI preferences (sidebar collapsed, density, last tab) | `localStorage` via `UserStorage`, namespaced by Clerk user id | Per-device conveniences only |
 | User preferences (base currency, reduced motion) | Backend `/api/me` | Follow the user across devices |

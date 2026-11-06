@@ -8,7 +8,8 @@
  * this context only caches what /api/accounts returns and re-reads it after
  * every order. Prices for orders are set by the server, never sent from here.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { apiGet, apiPost } from '@/lib/api';
 import { onBrokersChanged } from '@/lib/brokers';
 import type { Account, OrderResult, PositionsResponse, Profile } from '@/types/api';
@@ -34,21 +35,29 @@ type PortfolioState = {
 
 const PortfolioContext = createContext<PortfolioState | null>(null);
 
-export function PortfolioProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<Profile | null>(null);
+export function PortfolioProvider({ children, initialProfile = null }: { children: ReactNode; initialProfile?: Profile | null }) {
+  const [profile, setProfile] = useState<Profile | null>(initialProfile);
+  // The signed-in layout already read /api/me on the server: the first load reuses it.
+  const serverProfile = useRef(initialProfile !== null);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [account, setAccount] = useState<Account | null>(null);
   const [book, setBook] = useState<PositionsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
+  const router = useRouter();
 
   const refresh = useCallback(async () => {
+    const reuseProfile = serverProfile.current;
+    serverProfile.current = false;
     try {
       const [me, accounts] = await Promise.all([
-        apiGet<Profile>('/api/me'),
+        reuseProfile ? null : apiGet<Profile>('/api/me'),
         apiGet<{ accounts: Account[] }>('/api/accounts'),
       ]);
-      setProfile(me);
+      if (me) setProfile(me);
+      // The layout lets people in when it couldn't read the profile (outage, timeout).
+      // This copy can tell: someone who hasn't finished onboarding goes there now.
+      if (me && !me.onboarded) router.replace('/onboarding');
       setAccounts(accounts.accounts);
       // Real (broker) accounts are read-only; this context drives paper trading.
       const acct = accounts.accounts.find((a) => a.kind === 'paper') ?? null;
@@ -60,7 +69,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     // Initial load; every later refresh is triggered by an order or a retry.

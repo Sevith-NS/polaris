@@ -12,48 +12,45 @@ import { useToast } from '@/components/ui/Toast';
 import { apiDelete, apiPatch, apiPost, errorMessage } from '@/lib/api';
 import { formatNumber, formatPct, timeAgo } from '@/lib/format';
 import { announceAlertsSeen } from '@/lib/useAlertCount';
-import { useApi } from '@/lib/useApi';
+import { optimistic, useApi } from '@/lib/useApi';
 import type { Alert, AlertFiring } from '@/types/api';
 
 type Tab = 'scheduled' | 'triggered';
 
-/** Edit, pause, resume, re-arm and delete for one alert, with a toast either way. */
-function Actions({ a, onChanged, onEdit }: { a: Alert; onChanged: () => void; onEdit: (a: Alert) => void }) {
+/**
+ * Edit, pause, resume, re-arm and delete for one alert. A change shows at once
+ * (every view of /api/alerts, the chart's lines too) and the server confirms it
+ * behind; a failure puts the alert back and says why.
+ */
+function Actions({ a, onDeleted, onEdit }: { a: Alert; onDeleted: () => void; onEdit: (a: Alert) => void }) {
   const toast = useToast();
-  const [busy, setBusy] = useState<string | null>(null);
-  const act = async (label: string, run: () => Promise<unknown>, done: string) => {
-    setBusy(label);
+  const act = async (update: (list: Alert[]) => Alert[], write: () => Promise<unknown>, done: string) => {
     try {
-      await run();
+      await optimistic<{ alerts: Alert[] }>('/api/alerts', (d) => ({ ...d, alerts: update(d.alerts) }), write);
       toast.show({ message: done });
-      onChanged();
     } catch (err) {
       toast.show({ message: errorMessage(err), tone: 'error' });
-    } finally {
-      setBusy(null);
     }
   };
   const setStatus = (status: 'active' | 'paused', done: string) =>
-    act(status, () => apiPatch(`/api/alerts/${a.id}`, { status }), done);
+    act((list) => list.map((x) => (x.id === a.id ? { ...x, status, triggered_at: status === 'active' ? null : x.triggered_at } : x)),
+        () => apiPatch(`/api/alerts/${a.id}`, { status }), done);
+  const remove = () =>
+    act((list) => list.filter((x) => x.id !== a.id), () => apiDelete(`/api/alerts/${a.id}`).then(onDeleted), 'Alert deleted');
 
   return (
     <div className="flex flex-wrap gap-2">
       {a.status === 'triggered' && (
-        <Button variant="secondary" loading={busy === 'active'} onClick={() => setStatus('active', 'Alert is on again')}>
-          Turn on again
-        </Button>
+        <Button variant="secondary" onClick={() => setStatus('active', 'Alert is on again')}>Turn on again</Button>
       )}
       {a.status === 'paused' && (
-        <Button variant="secondary" loading={busy === 'active'} onClick={() => setStatus('active', 'Alert resumed')}>Resume</Button>
+        <Button variant="secondary" onClick={() => setStatus('active', 'Alert resumed')}>Resume</Button>
       )}
       {a.status !== 'triggered' && <Button variant="ghost" onClick={() => onEdit(a)}>Edit</Button>}
       {a.status === 'active' && (
-        <Button variant="ghost" loading={busy === 'paused'} onClick={() => setStatus('paused', 'Alert paused')}>Pause</Button>
+        <Button variant="ghost" onClick={() => setStatus('paused', 'Alert paused')}>Pause</Button>
       )}
-      <Button variant="ghost" loading={busy === 'delete'}
-              onClick={() => act('delete', () => apiDelete(`/api/alerts/${a.id}`), 'Alert deleted')}>
-        Delete
-      </Button>
+      <Button variant="ghost" onClick={remove}>Delete</Button>
     </div>
   );
 }
@@ -139,7 +136,7 @@ function AlertsPage() {
                 {scheduled.map((a) => (
                   <Row key={a.id} subject={a} note={a.note} meta={scheduledMeta(a)}
                        label={a.status === 'paused' && <span className="pill text-fg-2">Paused</span>}
-                       actions={<Actions a={a} onChanged={reload} onEdit={edit} />} />
+                       actions={<Actions a={a} onDeleted={firings.reload} onEdit={edit} />} />
                 ))}
               </ul>
             ) : (
@@ -156,11 +153,11 @@ function AlertsPage() {
                   <Row key={f.id} subject={f} note={live?.note}
                        label={!f.seen && <span className="pill text-fg">New</span>}
                        meta={`Fired ${timeAgo(f.fired_at)} at ${formatNumber(f.price, 2)}${f.change_pct !== null ? `, ${formatPct(f.change_pct)} on the day` : ''}.`}
-                       actions={live && <Actions a={live} onChanged={reload} onEdit={edit} />} />
+                       actions={live && <Actions a={live} onDeleted={firings.reload} onEdit={edit} />} />
                 ))}
                 {older.map((a) => (
                   <Row key={a.id} subject={a} note={a.note} meta={`Fired ${a.triggered_at ? timeAgo(a.triggered_at) : 'earlier'}.`}
-                       actions={<Actions a={a} onChanged={reload} onEdit={edit} />} />
+                       actions={<Actions a={a} onDeleted={firings.reload} onEdit={edit} />} />
                 ))}
               </ul>
             ) : (
